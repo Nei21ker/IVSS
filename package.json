@@ -1,0 +1,12 @@
+{
+  "name": "ivss-hospital-system",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión, Registro e Historia Clínica de Pacientes - Hospital Pastor Oropeza",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -o"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+} 

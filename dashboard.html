@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Autorizados - IVSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Mejoras en el diseño general */
+        :root {
+            --primary-color: #d9534f;
+            --primary-hover: #c9302c;
+            --secondary-color: #26a69a;
+            --secondary-hover: #2bbbad;
+            --background-light: #f0f2f5;
+            --text-primary: #333;
+            --text-secondary: #666;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* Mejoras en el header */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            padding: 1.25rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-top {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 1.875rem;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .departments-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .department-button {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .department-button:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .department-button.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+        }
+
+        .logout-button {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s;
+            margin-left: 1rem;
+        }
+
+        .logout-button:hover {
+            background-color: #f5c6cb;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 2rem;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .department-view-container {
+            flex: 3;
+            min-width: 60%;
+            text-align: left;
+        }
+
+        .calendar-section {
+            flex: 2;
+            min-width: 30%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        .calendar-header button {
+            background-color: #d9534f;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-header button:hover {
+            background-color: #c9302c;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .calendar-day-header {
+            font-weight: 700;
+            color: #555;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .calendar-day {
+            padding: 0.75rem 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: #333;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background-color: rgba(217, 83, 79, 0.1);
+            border: 1px solid rgba(217, 83, 79, 0.2);
+        }
+
+        .calendar-day.current-month {
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .calendar-day.other-month {
+            color: #bbb;
+            background-color: #f5f5f5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .calendar-day.selected-day {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3);
+        }
+
+        .calendar-day.has-patient::after {
+            content: '•';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            color: #007bff;
+            font-size: 1.5rem;
+            line-height: 0;
+        }
+
+        .calendar-day.today-highlight {
+            background-color: #d9534f;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 0 0 2px #d9534f;
+        }
+
+        .selected-day-patients-list {
+            margin-top: 1.5rem;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .selected-day-patients-list h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.75rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .selected-day-patient-item {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .selected-day-patient-item p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .selected-day-patient-item strong {
+            color: #d9534f;
+        }
+
+        .department-details {
+            width: 100%;
+            text-align: left;
+        }
+
+        .department-details h3 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .room-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .room-card h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .bed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .bed-item {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .bed-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .bed-item strong {
+            color: #d9534f;
+        }
+
+        .bed-item p {
+            margin-bottom: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .bed-item .medications {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: color 0.3s ease;
+        }
+
+        .medication-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.2rem;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .medication-item .med-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .medication-item input[type="checkbox"] {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .bed-manage-btn {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .bed-manage-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .dashboard-header {
+            background-color: #2d3748;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .main-content {
+            background-color: #2d3748;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .calendar-section {
+            background-color: #2d3748;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .calendar-header {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .calendar-day-header {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .calendar-day.current-month {
+            background-color: #4a5568;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .calendar-day.other-month {
+            background-color: #2d3748;
+            color: #a0aec0;
+        }
+
+        body.dark-mode .calendar-day:hover {
+            background-color: #636b6f;
+        }
+
+        body.dark-mode .selected-day-patients-list {
+            border-top-color: #4a5568;
+        }
+
+        body.dark-mode .selected-day-patients-list h4 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .selected-day-patient-item {
+            background-color: #4a5568;
+            border-color: #636b6f;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .selected-day-patient-item p {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .department-details h3 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .room-card {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .room-card h4 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .bed-item {
+            background: #2d3748;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .bed-item p {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .bed-item .medications {
+            color: #a0aec0;
+        }
+
+        .theme-toggle-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle-button:hover {
+            color: #f0f0f0;
+        }
+
+        /* Estilos actualizados para el modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 32rem;
+            margin: 1rem;
+            position: relative;
+            animation: modalFadeIn 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Estilo para cuando el modal está activo */
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        /* Ajuste para el contenido principal cuando el modal está activo */
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* Mejoras en los inputs y botones del modal */
+        .medication-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .medication-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.1);
+            outline: none;
+        }
+
+        .add-med-btn {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .add-med-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        /* Mejoras en el calendario */
+        .calendar-day {
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day.has-patient {
+            background-color: rgba(217, 83, 79, 0.1);
+            border: 1px solid rgba(217, 83, 79, 0.2);
+        }
+
+        .calendar-day.selected-day {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3);
+        }
+
+        /* Dark mode improvements */
+        body.dark-mode .modal-content {
+            background: #2d3748;
+        }
+
+        body.dark-mode .medication-input {
+            background: #1a202c;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+
+        /* Animaciones de notificaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(20px); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .animate-fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Actualizar la estructura del modal -->
+    <div id="patientManagementModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" class="text-xl font-semibold text-white"></h2>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <h3 class="text-center text-gray-600 mb-6">Gestión de Medicamentos y Notas</h3>
+                
+                <div class="mb-6">
+                    <h4 class="font-semibold mb-3">Medicamentos Prescritos:</h4>
+                    <div id="medicationsList" class="space-y-2">
+                        <!-- Los medicamentos se agregarán aquí dinámicamente -->
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="newMedication" 
+                                   class="flex-1 p-3 border rounded-lg bg-gray-50 placeholder-gray-400"
+                                   placeholder="Añadir nuevo medicamento">
+                            <button onclick="addMedication()" 
+                                    class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 font-medium">
+                                Añadir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="font-semibold mb-3">Notas del Paciente:</h4>
+                    <textarea id="patientNotes" rows="4" 
+                        class="w-full p-3 border rounded-lg bg-gray-50 placeholder-gray-400 resize-none"
+                        placeholder="Escribe aquí cualquier nota importante sobre el paciente o los efectos de los medicamentos..."></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="closeModal()" 
+                    class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium">
+                    Cancelar
+                </button>
+                <button onclick="saveChanges()" 
+                    class="px-6 py-2 bg-[#26a69a] text-white rounded-lg hover:bg-[#2bbbad] font-medium">
+                    Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="dashboard-header">
+        <div class="header-top">
+            <h1 class="header-title">Dashboard de Autorizados</h1>
+            <div class="header-actions">
+                <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+                <button id="themeToggleBtn" class="theme-toggle-button">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+        <nav class="departments-nav">
+            <a href="#" class="department-button" data-department="traumatologia">
+                <i class="fas fa-bone"></i> Traumatología
+            </a>
+            <a href="#" class="department-button" data-department="ginecologia">
+                <i class="fas fa-venus"></i> Ginecología
+            </a>
+            <a href="#" class="department-button" data-department="pediatria">
+                <i class="fas fa-child"></i> Pediatría
+            </a>
+            <a href="#" class="department-button" data-department="medicina_interna">
+                <i class="fas fa-stethoscope"></i> Medicina Interna
+            </a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="department-view-container">
+            <div id="welcomeContent" class="text-center">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Bienvenido, Usuario Autorizado</h2>
+                <p class="text-xl text-gray-600">Selecciona un departamento para ver la información de las salas y pacientes.</p>
+            </div>
+
+            <div id="departmentDetails" class="department-details hidden">
+                <!-- El contenido del departamento se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div id="calendarSection" class="calendar-section">
+            <div class="calendar-header">
+                <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                <span id="currentMonthYear"></span>
+                <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- El calendario se llenará dinámicamente -->
+            </div>
+            <div id="selectedDayPatientsList" class="selected-day-patients-list hidden">
+                <h4>Pacientes Ingresados el <span id="selectedDateDisplay"></span>:</h4>
+                <div id="patientsOnSelectedDay">
+                    <!-- La lista de pacientes se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Datos de ejemplo para los departamentos
+        const hospitalData = {
+            traumatologia: {
+                name: "Traumatología",
+                rooms: [
+                    {
+                        id: "T-01",
+                        beds: [
+                            { id: "T-01-01", patient: "Juan Pérez", admissionDate: "2024-05-10", reason: "Fractura de fémur", bloodType: "O+", medications: ["Ibuprofeno", "Tramadol"] },
+                            { id: "T-01-02", patient: "María González", admissionDate: "2024-05-12", reason: "Esguince de tobillo", bloodType: "A-", medications: ["Naproxeno", "Diclofenaco"] },
+                            { id: "T-01-03", patient: "Carlos Rodríguez", admissionDate: "2024-05-15", reason: "Luxación de hombro", bloodType: "B+", medications: ["Ketorolaco", "Paracetamol"] },
+                            { id: "T-01-04", patient: "Ana Torres", admissionDate: "2024-05-16", reason: "Fractura de muñeca", bloodType: "AB+", medications: ["Tramadol", "Diazepam"] },
+                            { id: "T-01-05", patient: "Luis Martínez", admissionDate: "2024-05-17", reason: "Lesión de rodilla", bloodType: "O-", medications: ["Ibuprofeno", "Naproxeno"] },
+                            { id: "T-01-06", patient: "Carmen Silva", admissionDate: "2024-05-18", reason: "Fractura de cadera", bloodType: "A+", medications: ["Morfina", "Tramadol"] }
+                        ]
+                    },
+                    {
+                        id: "T-02",
+                        beds: [
+                            { id: "T-02-01", patient: "Roberto Díaz", admissionDate: "2024-05-19", reason: "Fractura de tibia", bloodType: "B-", medications: ["Ketorolaco", "Tramadol"] },
+                            { id: "T-02-02", patient: "Patricia López", admissionDate: "2024-05-20", reason: "Lesión de ligamentos", bloodType: "O+", medications: ["Ibuprofeno", "Diclofenaco"] },
+                            { id: "T-02-03", patient: "Miguel Sánchez", admissionDate: "2024-05-21", reason: "Fractura de clavícula", bloodType: "A+", medications: ["Naproxeno", "Paracetamol"] },
+                            { id: "T-02-04", patient: "Isabel Ramírez", admissionDate: "2024-05-22", reason: "Esguince lumbar", bloodType: "AB-", medications: ["Tramadol", "Diazepam"] },
+                            { id: "T-02-05", patient: "Fernando Castro", admissionDate: "2024-05-23", reason: "Fractura de costillas", bloodType: "B+", medications: ["Morfina", "Ketorolaco"] },
+                            { id: "T-02-06", patient: "Diana Morales", admissionDate: "2024-05-24", reason: "Lesión de tobillo", bloodType: "O-", medications: ["Ibuprofeno", "Naproxeno"] }
+                        ]
+                    },
+                    {
+                        id: "T-03",
+                        beds: [
+                            { id: "T-03-01", patient: "Jorge Vargas", admissionDate: "2024-05-25", reason: "Fractura de húmero", bloodType: "A-", medications: ["Tramadol", "Diclofenaco"] },
+                            { id: "T-03-02", patient: "Laura Jiménez", admissionDate: "2024-05-26", reason: "Lesión de menisco", bloodType: "O+", medications: ["Ketorolaco", "Paracetamol"] },
+                            { id: "T-03-03", patient: "Ricardo Flores", admissionDate: "2024-05-27", reason: "Fractura de radio", bloodType: "B+", medications: ["Ibuprofeno", "Diazepam"] },
+                            { id: "T-03-04", patient: "Sofía Mendoza", admissionDate: "2024-05-28", reason: "Lesión cervical", bloodType: "AB+", medications: ["Naproxeno", "Tramadol"] },
+                            { id: "T-03-05", patient: "Gabriel Herrera", admissionDate: "2024-05-29", reason: "Fractura de tobillo", bloodType: "O-", medications: ["Morfina", "Ketorolaco"] },
+                            { id: "T-03-06", patient: "Valentina Ortiz", admissionDate: "2024-05-30", reason: "Lesión de hombro", bloodType: "A+", medications: ["Diclofenaco", "Paracetamol"] }
+                        ]
+                    }
+                ]
+            },
+            ginecologia: {
+                name: "Ginecología",
+                rooms: [
+                    {
+                        id: "G-01",
+                        beds: [
+                            { id: "G-01-01", patient: "María Fernández", admissionDate: "2024-05-10", reason: "Control prenatal", bloodType: "A+", medications: ["Ácido fólico", "Hierro"] },
+                            { id: "G-01-02", patient: "Ana García", admissionDate: "2024-05-11", reason: "Parto programado", bloodType: "O+", medications: ["Oxitocina", "Hierro"] },
+                            { id: "G-01-03", patient: "Carmen López", admissionDate: "2024-05-12", reason: "Cesárea programada", bloodType: "B+", medications: ["Antibióticos", "Analgésicos"] },
+                            { id: "G-01-04", patient: "Laura Torres", admissionDate: "2024-05-13", reason: "Embarazo de alto riesgo", bloodType: "AB+", medications: ["Progesterona", "Ácido fólico"] },
+                            { id: "G-01-05", patient: "Patricia Ruiz", admissionDate: "2024-05-14", reason: "Control postparto", bloodType: "O-", medications: ["Hierro", "Vitaminas"] },
+                            { id: "G-01-06", patient: "Sofia Martínez", admissionDate: "2024-05-15", reason: "Preeclampsia", bloodType: "A-", medications: ["Antihipertensivos", "Magnesio"] }
+                        ]
+                    },
+                    {
+                        id: "G-02",
+                        beds: [
+                            { id: "G-02-01", patient: "Isabel Díaz", admissionDate: "2024-05-16", reason: "Embarazo gemelar", bloodType: "B-", medications: ["Ácido fólico", "Hierro"] },
+                            { id: "G-02-02", patient: "Diana Castro", admissionDate: "2024-05-17", reason: "Control prenatal", bloodType: "O+", medications: ["Vitaminas prenatales", "Calcio"] },
+                            { id: "G-02-03", patient: "Valentina Morales", admissionDate: "2024-05-18", reason: "Amenaza de parto", bloodType: "A+", medications: ["Tocolíticos", "Corticoides"] },
+                            { id: "G-02-04", patient: "Gabriela Soto", admissionDate: "2024-05-19", reason: "Cesárea de emergencia", bloodType: "AB-", medications: ["Antibióticos", "Analgésicos"] },
+                            { id: "G-02-05", patient: "Carolina Vargas", admissionDate: "2024-05-20", reason: "Control postparto", bloodType: "B+", medications: ["Hierro", "Antibióticos"] },
+                            { id: "G-02-06", patient: "Andrea Jiménez", admissionDate: "2024-05-21", reason: "Preeclampsia severa", bloodType: "O-", medications: ["Antihipertensivos", "Magnesio"] }
+                        ]
+                    },
+                    {
+                        id: "G-03",
+                        beds: [
+                            { id: "G-03-01", patient: "Lucía Mendoza", admissionDate: "2024-05-22", reason: "Parto prematuro", bloodType: "A-", medications: ["Tocolíticos", "Corticoides"] },
+                            { id: "G-03-02", patient: "Mariana Flores", admissionDate: "2024-05-23", reason: "Control prenatal", bloodType: "O+", medications: ["Ácido fólico", "Hierro"] },
+                            { id: "G-03-03", patient: "Daniela Herrera", admissionDate: "2024-05-24", reason: "Cesárea programada", bloodType: "B+", medications: ["Antibióticos", "Analgésicos"] },
+                            { id: "G-03-04", patient: "Paula Ortiz", admissionDate: "2024-05-25", reason: "Embarazo de alto riesgo", bloodType: "AB+", medications: ["Progesterona", "Vitaminas"] },
+                            { id: "G-03-05", patient: "Camila Rivas", admissionDate: "2024-05-26", reason: "Control postparto", bloodType: "O-", medications: ["Hierro", "Antibióticos"] },
+                            { id: "G-03-06", patient: "Victoria Silva", admissionDate: "2024-05-27", reason: "Preeclampsia", bloodType: "A+", medications: ["Antihipertensivos", "Magnesio"] }
+                        ]
+                    }
+                ]
+            },
+            pediatria: {
+                name: "Pediatría",
+                rooms: [
+                    {
+                        id: "P-01",
+                        beds: [
+                            { id: "P-01-01", patient: "Lucas Rodríguez", admissionDate: "2024-05-10", reason: "Bronquitis aguda", bloodType: "A+", medications: ["Salbutamol", "Antibióticos"] },
+                            { id: "P-01-02", patient: "Emma González", admissionDate: "2024-05-11", reason: "Fiebre alta", bloodType: "O-", medications: ["Paracetamol", "Ibuprofeno"] },
+                            { id: "P-01-03", patient: "Mateo López", admissionDate: "2024-05-12", reason: "Neumonía", bloodType: "B+", medications: ["Antibióticos", "Antitérmicos"] },
+                            { id: "P-01-04", patient: "Sofía Torres", admissionDate: "2024-05-13", reason: "Deshidratación", bloodType: "AB+", medications: ["Suero", "Electrolitos"] },
+                            { id: "P-01-05", patient: "Santiago Ruiz", admissionDate: "2024-05-14", reason: "Asma", bloodType: "O+", medications: ["Salbutamol", "Corticoides"] },
+                            { id: "P-01-06", patient: "Isabella Martínez", admissionDate: "2024-05-15", reason: "Gastroenteritis", bloodType: "A-", medications: ["Probióticos", "Antieméticos"] }
+                        ]
+                    },
+                    {
+                        id: "P-02",
+                        beds: [
+                            { id: "P-02-01", patient: "Benjamín Díaz", admissionDate: "2024-05-16", reason: "Otitis media", bloodType: "B-", medications: ["Antibióticos", "Analgésicos"] },
+                            { id: "P-02-02", patient: "Valentina Castro", admissionDate: "2024-05-17", reason: "Amigdalitis", bloodType: "O+", medications: ["Antibióticos", "Ibuprofeno"] },
+                            { id: "P-02-03", patient: "Daniel Morales", admissionDate: "2024-05-18", reason: "Bronquiolitis", bloodType: "A+", medications: ["Salbutamol", "Oxígeno"] },
+                            { id: "P-02-04", patient: "Emilia Soto", admissionDate: "2024-05-19", reason: "Varicela", bloodType: "AB-", medications: ["Antivirales", "Antihistamínicos"] },
+                            { id: "P-02-05", patient: "Joaquín Vargas", admissionDate: "2024-05-20", reason: "Apendicitis", bloodType: "B+", medications: ["Antibióticos", "Analgésicos"] },
+                            { id: "P-02-06", patient: "Antonia Jiménez", admissionDate: "2024-05-21", reason: "Deshidratación", bloodType: "O-", medications: ["Suero", "Electrolitos"] }
+                        ]
+                    },
+                    {
+                        id: "P-03",
+                        beds: [
+                            { id: "P-03-01", patient: "Tomás Mendoza", admissionDate: "2024-05-22", reason: "Bronquitis", bloodType: "A-", medications: ["Salbutamol", "Antibióticos"] },
+                            { id: "P-03-02", patient: "Renata Flores", admissionDate: "2024-05-23", reason: "Neumonía", bloodType: "O+", medications: ["Antibióticos", "Antitérmicos"] },
+                            { id: "P-03-03", patient: "Agustín Herrera", admissionDate: "2024-05-24", reason: "Asma", bloodType: "B+", medications: ["Salbutamol", "Corticoides"] },
+                            { id: "P-03-04", patient: "Amanda Ortiz", admissionDate: "2024-05-25", reason: "Gastroenteritis", bloodType: "AB+", medications: ["Probióticos", "Antieméticos"] },
+                            { id: "P-03-05", patient: "Felipe Rivas", admissionDate: "2024-05-26", reason: "Otitis", bloodType: "O-", medications: ["Antibióticos", "Analgésicos"] },
+                            { id: "P-03-06", patient: "Isidora Silva", admissionDate: "2024-05-27", reason: "Amigdalitis", bloodType: "A+", medications: ["Antibióticos", "Ibuprofeno"] }
+                        ]
+                    }
+                ]
+            },
+            medicina_interna: {
+                name: "Medicina Interna",
+                rooms: [
+                    {
+                        id: "MI-01",
+                        beds: [
+                            { id: "MI-01-01", patient: "Roberto Fernández", admissionDate: "2024-05-10", reason: "Hipertensión", bloodType: "A+", medications: ["Enalapril", "Amlodipino"] },
+                            { id: "MI-01-02", patient: "Carmen García", admissionDate: "2024-05-11", reason: "Diabetes", bloodType: "O+", medications: ["Metformina", "Insulina"] },
+                            { id: "MI-01-03", patient: "Jorge López", admissionDate: "2024-05-12", reason: "Neumonía", bloodType: "B+", medications: ["Antibióticos", "Broncodilatadores"] },
+                            { id: "MI-01-04", patient: "María Torres", admissionDate: "2024-05-13", reason: "Insuficiencia cardíaca", bloodType: "AB+", medications: ["Furosemida", "Carvedilol"] },
+                            { id: "MI-01-05", patient: "Luis Ruiz", admissionDate: "2024-05-14", reason: "EPOC", bloodType: "O-", medications: ["Salbutamol", "Corticoides"] },
+                            { id: "MI-01-06", patient: "Ana Martínez", admissionDate: "2024-05-15", reason: "Arritmia", bloodType: "A-", medications: ["Amiodarona", "Warfarina"] }
+                        ]
+                    },
+                    {
+                        id: "MI-02",
+                        beds: [
+                            { id: "MI-02-01", patient: "Carlos Díaz", admissionDate: "2024-05-16", reason: "Cirrosis", bloodType: "B-", medications: ["Furosemida", "Espironolactona"] },
+                            { id: "MI-02-02", patient: "Patricia Castro", admissionDate: "2024-05-17", reason: "Pancreatitis", bloodType: "O+", medications: ["Analgésicos", "Antibióticos"] },
+                            { id: "MI-02-03", patient: "Miguel Morales", admissionDate: "2024-05-18", reason: "Trombosis", bloodType: "A+", medications: ["Heparina", "Warfarina"] },
+                            { id: "MI-02-04", patient: "Isabel Soto", admissionDate: "2024-05-19", reason: "Insuficiencia renal", bloodType: "AB-", medications: ["Eritropoyetina", "Calcio"] },
+                            { id: "MI-02-05", patient: "Fernando Vargas", admissionDate: "2024-05-20", reason: "Hepatitis", bloodType: "B+", medications: ["Antivirales", "Protectores hepáticos"] },
+                            { id: "MI-02-06", patient: "Diana Jiménez", admissionDate: "2024-05-21", reason: "Diabetes", bloodType: "O-", medications: ["Metformina", "Insulina"] }
+                        ]
+                    },
+                    {
+                        id: "MI-03",
+                        beds: [
+                            { id: "MI-03-01", patient: "Pedro Mendoza", admissionDate: "2024-05-22", reason: "Hipertensión", bloodType: "A-", medications: ["Enalapril", "Hidroclorotiazida"] },
+                            { id: "MI-03-02", patient: "Laura Flores", admissionDate: "2024-05-23", reason: "EPOC", bloodType: "O+", medications: ["Salbutamol", "Corticoides"] },
+                            { id: "MI-03-03", patient: "Ricardo Herrera", admissionDate: "2024-05-24", reason: "Insuficiencia cardíaca", bloodType: "B+", medications: ["Furosemida", "Carvedilol"] },
+                            { id: "MI-03-04", patient: "Sofía Ortiz", admissionDate: "2024-05-25", reason: "Arritmia", bloodType: "AB+", medications: ["Amiodarona", "Warfarina"] },
+                            { id: "MI-03-05", patient: "Gabriel Rivas", admissionDate: "2024-05-26", reason: "Pancreatitis", bloodType: "O-", medications: ["Analgésicos", "Antibióticos"] },
+                            { id: "MI-03-06", patient: "Valentina Silva", admissionDate: "2024-05-27", reason: "Trombosis", bloodType: "A+", medications: ["Heparina", "Warfarina"] }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Variables para el modal
+        let currentPatient = null;
+        let selectedDateForManagement = null;
+
+        // Función para actualizar el estado de un medicamento
+        function updateMedicationStatus(bedId, medicationName, isChecked) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Actualizar en hospitalData
+            for (const dept in hospitalData) {
+                hospitalData[dept].rooms.forEach(room => {
+                    room.beds.forEach(bed => {
+                        if (bed.id === bedId) {
+                            // Inicializar las estructuras si no existen
+                            if (!bed.medicationsStatus) {
+                                bed.medicationsStatus = {};
+                            }
+                            if (!bed.medicationsStatus[today]) {
+                                bed.medicationsStatus[today] = {};
+                            }
+                            // Actualizar el estado
+                            bed.medicationsStatus[today][medicationName] = isChecked;
+                        }
+                    });
+                });
+            }
+
+            // Mostrar notificación
+            showNotification(
+                `Medicamento ${medicationName} marcado como ${isChecked ? 'administrado' : 'no administrado'}`,
+                'success'
+            );
+        }
+
+        // Agregar event listener global para los checkboxes de medicamentos
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('medication-checkbox')) {
+                const bedId = e.target.dataset.bedId;
+                const medicationName = e.target.dataset.medication;
+                const isChecked = e.target.checked;
+                
+                updateMedicationStatus(bedId, medicationName, isChecked);
+            }
+        });
+
+        // Función para mostrar el modal
+        function showPatientManagement(patient) {
+            currentPatient = patient;
+            selectedDateForManagement = new Date().toISOString().split('T')[0];
+            const modal = document.getElementById('patientManagementModal');
+            document.body.classList.add('modal-open');
+            modal.classList.add('show');
+            
+            // Actualizar título del modal
+            document.getElementById('modalTitle').textContent = 
+                `Gestión de Paciente ${patient.patient} (${selectedDateForManagement})`;
+            
+            // Obtener el estado de los medicamentos para la fecha actual
+            const medicationsStatus = patient.medicationsStatus?.[selectedDateForManagement] || {};
+            
+            // Renderizar medicamentos con su estado
+            renderMedicationsInModal(patient.medications, medicationsStatus);
+            
+            // Cargar las notas del día
+            document.getElementById('patientNotes').value = 
+                patient.dailyNotes?.[selectedDateForManagement] || '';
+        }
+
+        // Función para renderizar medicamentos en el modal
+        function renderMedicationsInModal(prescribedMedications, medicationsStatus = {}) {
+            const medicationsList = document.getElementById('medicationsList');
+            medicationsList.innerHTML = '';
+
+            if (!prescribedMedications || prescribedMedications.length === 0) {
+                medicationsList.innerHTML = '<p class="text-gray-500 text-center py-3">No hay medicamentos prescritos.</p>';
+                return;
+            }
+
+            prescribedMedications.forEach((med) => {
+                const medDiv = document.createElement('div');
+                medDiv.className = 'modal-medication-item flex items-center p-3 bg-gray-50 rounded-lg mb-2';
+                const isChecked = medicationsStatus[med] === true;
+
+                medDiv.innerHTML = `
+                    <div class="flex items-center flex-1">
+                        <input type="checkbox" 
+                               class="medication-checkbox form-checkbox h-5 w-5 text-blue-600 mr-3 cursor-pointer" 
+                               data-bed-id="${currentPatient.id}"
+                               data-medication="${med}"
+                               ${isChecked ? 'checked' : ''}>
+                        <label class="cursor-pointer">${med}</label>
+                    </div>
+                    <button class="delete-med-btn text-white bg-red-500 px-4 py-1 rounded hover:bg-red-600 text-sm"
+                            data-medication="${med}">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                `;
+                medicationsList.appendChild(medDiv);
+            });
+
+            // Agregar event listeners para los botones de eliminar
+            medicationsList.querySelectorAll('.delete-med-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const medToDelete = this.dataset.medication;
+                    currentPatient.medications = currentPatient.medications.filter(med => med !== medToDelete);
+                    
+                    // Eliminar el estado del medicamento
+                    if (currentPatient.medicationsStatus && 
+                        currentPatient.medicationsStatus[selectedDateForManagement]) {
+                        delete currentPatient.medicationsStatus[selectedDateForManagement][medToDelete];
+                    }
+                    
+                    renderMedicationsInModal(
+                        currentPatient.medications, 
+                        currentPatient.medicationsStatus[selectedDateForManagement] || {}
+                    );
+                    
+                    // Actualizar la vista del departamento
+                    const activeDepartment = document.querySelector('.department-button.active');
+                    if (activeDepartment) {
+                        const departmentKey = activeDepartment.dataset.department;
+                        displayDepartmentDetails(hospitalData[departmentKey]);
+                    }
+                    
+                    showNotification('Medicamento eliminado correctamente', 'success');
+                });
+            });
+        }
+
+        // Función para mostrar los detalles del departamento
+        function displayDepartmentDetails(department) {
+            const welcomeContent = document.getElementById('welcomeContent');
+            const departmentDetailsDiv = document.getElementById('departmentDetails');
+            
+            welcomeContent.classList.add('hidden');
+            departmentDetailsDiv.classList.remove('hidden');
+
+            let detailsHtml = `<h3 class="text-2xl font-bold mb-6">${department.name}</h3>`;
+
+            department.rooms.forEach(room => {
+                detailsHtml += `
+                    <div class="room-card bg-white rounded-lg shadow-sm p-6 mb-6">
+                        <h4 class="text-xl font-bold mb-4">Sala ${room.id}</h4>
+                        <div class="bed-list space-y-4">
+                `;
+
+                room.beds.forEach(bed => {
+                    detailsHtml += `
+                        <div class="bed-item bg-white p-4 rounded-lg relative">
+                            <div class="flex justify-between items-start mb-3">
+                                <p class="text-red-500 font-semibold">Cama: ${bed.id}</p>
+                                <button onclick='showPatientManagement(${JSON.stringify({
+                                    id: bed.id,
+                                    patient: bed.patient,
+                                    admissionDate: bed.admissionDate,
+                                    reason: bed.reason,
+                                    bloodType: bed.bloodType,
+                                    medications: bed.medications || [],
+                                    medicationsStatus: bed.medicationsStatus || {},
+                                    dailyNotes: bed.dailyNotes || {}
+                                })})' 
+                                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                    Gestionar
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="mb-1"><strong>Paciente:</strong> ${bed.patient}</p>
+                                    <p class="mb-1"><strong>Ingreso:</strong> ${bed.admissionDate}</p>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>Motivo:</strong> ${bed.reason}</p>
+                                    <p class="mb-1"><strong>Tipo de Sangre:</strong> ${bed.bloodType}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="font-medium mb-2">Medicamentos:</p>
+                                <div class="space-y-2">
+                                    ${(bed.medications || []).map(med => {
+                                        const today = new Date().toISOString().split('T')[0];
+                                        const isTaken = bed.medicationsStatus?.[today]?.[med] || false;
+                                        return `
+                                            <div class="flex items-center gap-2 bg-white p-2 rounded border">
+                                                <input type="checkbox" 
+                                                       class="medication-checkbox form-checkbox h-4 w-4 text-blue-600 cursor-pointer" 
+                                                       data-bed-id="${bed.id}"
+                                                       data-medication="${med}"
+                                                       ${isTaken ? 'checked' : ''}>
+                                                <label class="flex-grow cursor-pointer">${med}</label>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                detailsHtml += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            departmentDetailsDiv.innerHTML = detailsHtml;
+        }
+
+        // Manejador de eventos para los botones de departamento
+        document.querySelectorAll('.department-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remover clase active de todos los botones
+                document.querySelectorAll('.department-button').forEach(btn => 
+                    btn.classList.remove('active'));
+                
+                // Agregar clase active al botón clickeado
+                this.classList.add('active');
+                
+                const departmentKey = this.dataset.department;
+                const department = hospitalData[departmentKey];
+                
+                if (department) {
+                    displayDepartmentDetails(department);
+                }
+            });
+        });
+
+        // Funcionalidad del calendario
+        const MONTH_NAMES = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+        const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            
+            document.getElementById('currentMonthYear').textContent = 
+                `${MONTH_NAMES[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            // Agregar encabezados de días
+            DAYS.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            // Agregar días del mes anterior
+            const firstDayIndex = firstDay.getDay();
+            for (let i = 0; i < firstDayIndex; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day other-month';
+                calendarGrid.appendChild(dayDiv);
+            }
+
+            // Agregar días del mes actual
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day current-month';
+                dayDiv.textContent = day;
+                
+                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dayDiv.dataset.date = dateStr;
+
+                // Marcar el día actual
+                if (day === new Date().getDate() && 
+                    currentDate.getMonth() === new Date().getMonth() && 
+                    currentDate.getFullYear() === new Date().getFullYear()) {
+                    dayDiv.classList.add('today-highlight');
+                }
+
+                // Verificar si hay pacientes en este día
+                let hasPatients = false;
+                for (const dept in hospitalData) {
+                    hospitalData[dept].rooms.forEach(room => {
+                        room.beds.forEach(bed => {
+                            if (bed.admissionDate === dateStr) {
+                                hasPatients = true;
+                            }
+                        });
+                    });
+                }
+                if (hasPatients) {
+                    dayDiv.classList.add('has-patient');
+                }
+
+                dayDiv.addEventListener('click', () => showPatientsForDay(dateStr));
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        function showPatientsForDay(dateStr) {
+            const selectedDayPatientsList = document.getElementById('selectedDayPatientsList');
+            const patientsOnSelectedDayDiv = document.getElementById('patientsOnSelectedDay');
+            const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+            
+            selectedDateDisplay.textContent = dateStr;
+            patientsOnSelectedDayDiv.innerHTML = '';
+            
+            let patientsFound = false;
+            
+            for (const dept in hospitalData) {
+                hospitalData[dept].rooms.forEach(room => {
+                    room.beds.forEach(bed => {
+                        if (bed.admissionDate === dateStr) {
+                            patientsFound = true;
+                            const patientItem = document.createElement('div');
+                            patientItem.className = 'selected-day-patient-item';
+                            patientItem.innerHTML = `
+                                <p><strong>Paciente:</strong> ${bed.patient}</p>
+                                <p><strong>Cama:</strong> ${bed.id}</p>
+                                <p><strong>Departamento:</strong> ${hospitalData[dept].name}</p>
+                                <p><strong>Motivo:</strong> ${bed.reason}</p>
+                            `;
+                            patientsOnSelectedDayDiv.appendChild(patientItem);
+                        }
+                    });
+                });
+            }
+            
+            if (!patientsFound) {
+                patientsOnSelectedDayDiv.innerHTML = '<p class="text-center text-gray-600">No hay pacientes ingresados en esta fecha.</p>';
+            }
+            
+            selectedDayPatientsList.classList.remove('hidden');
+        }
+
+        // Event listeners para los botones del calendario
+        document.getElementById('prevMonthBtn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonthBtn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Funcionalidad del botón de modo oscuro
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Verificar preferencia guardada
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            themeIcon.className = 'fas fa-sun';
+        }
+
+        themeToggleBtn.addEventListener('click', toggleDarkMode);
+
+        // Funcionalidad del botón de cerrar sesión
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // Inicializar el calendario al cargar la página
+        renderCalendar();
+
+        // Función para añadir nuevo medicamento
+        function addMedication() {
+            const newMedInput = document.getElementById('newMedication');
+            const medicationName = newMedInput.value.trim();
+            
+            if (!medicationName) {
+                showNotification('Por favor ingrese un nombre de medicamento', 'error');
+                return;
+            }
+
+            if (!currentPatient) {
+                showNotification('Error: No hay paciente seleccionado', 'error');
+                return;
+            }
+
+            if (!currentPatient.medications) {
+                currentPatient.medications = [];
+            }
+            
+            // Evitar duplicados
+            if (currentPatient.medications.includes(medicationName)) {
+                showNotification('Este medicamento ya está en la lista', 'error');
+                return;
+            }
+
+            // Añadir el nuevo medicamento
+            currentPatient.medications.push(medicationName);
+            
+            // Inicializar el estado del nuevo medicamento
+            if (!currentPatient.medicationsStatus) {
+                currentPatient.medicationsStatus = {};
+            }
+            if (!currentPatient.medicationsStatus[selectedDateForManagement]) {
+                currentPatient.medicationsStatus[selectedDateForManagement] = {};
+            }
+            currentPatient.medicationsStatus[selectedDateForManagement][medicationName] = false;
+            
+            // Re-renderizar la lista con el nuevo medicamento
+            renderMedicationsInModal(
+                currentPatient.medications, 
+                currentPatient.medicationsStatus[selectedDateForManagement]
+            );
+            
+            // Limpiar el input
+            newMedInput.value = '';
+            
+            // Mostrar notificación de éxito
+            showNotification('Medicamento añadido correctamente', 'success');
+        }
+
+        // Agregar event listener para el input de nuevo medicamento
+        document.getElementById('newMedication').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addMedication();
+            }
+        });
+
+        // Función para cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById('patientManagementModal');
+            document.body.classList.remove('modal-open');
+            modal.classList.remove('show');
+            currentPatient = null;
+            selectedDateForManagement = null;
+        }
+
+        // Función para guardar cambios
+        function saveChanges() {
+            if (!currentPatient || !selectedDateForManagement) return;
+
+            // Recopilar notas
+            const notes = document.getElementById('patientNotes').value;
+
+            // Actualizar datos del paciente en hospitalData
+            for (const dept in hospitalData) {
+                hospitalData[dept].rooms.forEach(room => {
+                    room.beds.forEach(bed => {
+                        if (bed.id === currentPatient.id) {
+                            // Actualizar lista de medicamentos
+                            bed.medications = currentPatient.medications;
+                            
+                            // Inicializar o actualizar las notas diarias
+                            if (!bed.dailyNotes) {
+                                bed.dailyNotes = {};
+                            }
+                            bed.dailyNotes[selectedDateForManagement] = notes;
+                        }
+                    });
+                });
+            }
+
+            // Cerrar modal y actualizar vista
+            closeModal();
+            
+            // Actualizar la vista del departamento actual
+            const activeDepartment = document.querySelector('.department-button.active');
+            if (activeDepartment) {
+                const departmentKey = activeDepartment.dataset.department;
+                displayDepartmentDetails(hospitalData[departmentKey]);
+            }
+
+            // Mostrar notificación de éxito
+            showNotification('Cambios guardados exitosamente', 'success');
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white z-50 animate-fade-in`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            // Remover la notificación después de 3 segundos
+            setTimeout(() => {
+                notification.classList.add('animate-fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Agregar event listeners para los botones del modal
+        document.getElementById('patientManagementModal').addEventListener('click', function(e) {
+            if (e.target.matches('button[onclick="closeModal()"]')) {
+                closeModal();
+            } else if (e.target.matches('button[onclick="saveChanges()"]')) {
+                saveChanges();
+            }
+        });
+
+        // Agregar event listener para la tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('patientManagementModal').classList.contains('show')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html> 
