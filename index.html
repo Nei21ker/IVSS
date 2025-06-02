@@ -3,156 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IVSS - Hospital Pastor Oropeza</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login - Hospital Pastor Oropeza IVSS</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .login-container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .hospital-logo {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 1.5rem;
-            display: block;
-        }
-
-        .hospital-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .login-title {
-            color: #2d3748;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .input-group label {
-            display: block;
-            color: #4a5568;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #d9534f;
-            box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.1);
-        }
-
-        .login-button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #d9534f;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .login-button:hover {
-            background-color: #c9302c;
-        }
-
-        .forgot-password {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .forgot-password a {
-            color: #d9534f;
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
-        .hospital-info {
-            text-align: center;
-            color: white;
-            margin-top: 2rem;
-            font-size: 0.875rem;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="login-container">
-            <div class="hospital-logo">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48Y2lyY2xlIGN4PSIxMjAiIGN5PSIxMjAiIHI9IjExNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRUQxQzI0IiBzdHJva2Utd2lkdGg9IjEwIi8+PHBhdGggZD0iTTg1IDEyMGMwLTI1IDIwLTQ1IDQ1LTQ1czQ1IDIwIDQ1IDQ1LTIwIDQ1LTQ1IDQ1LTQ1LTIwLTQ1LTQ1em0tMjAgMGMwIDM1IDMwIDY1IDY1IDY1czY1LTMwIDY1LTY1LTMwLTY1LTY1LTY1LTY1IDMwLTY1IDY1eiIgZmlsbD0iI0VEMUM0MiIvPjxwYXRoIGQ9Ik0xMjAgMTYwYy0yMiAwLTQwLTE4LTQwLTQwczE4LTQwIDQwLTQwIDQwIDE4IDQwIDQwLTE4IDQwLTQwIDQwem0wLTcwYy0xNi41IDAtMzAgMTMuNS0zMCAzMHMxMy41IDMwIDMwIDMwIDMwLTEzLjUgMzAtMzAtMTMuNS0zMC0zMC0zMHoiIGZpbGw9IiNFRDFDMjQiLz48L3N2Zz4=" alt="IVSS Logo">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo-container">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/IVSS.jpg" alt="IVSS Logo" class="login-logo">
             </div>
+            
             <h1 class="login-title">Sistema de Gestión Hospitalaria</h1>
             
-            <form id="loginForm">
-                <div class="input-group">
-                    <label for="username">Usuario</label>
-                    <input type="text" id="username" name="username" required>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <input type="text" id="username" placeholder="Usuario" required>
+                    <i class="fas fa-user"></i>
                 </div>
                 
-                <div class="input-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="Contraseña" required>
+                    <i class="fas fa-lock"></i>
                 </div>
                 
-                <button type="submit" class="login-button">Iniciar Sesión</button>
+                <button type="submit" class="login-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </button>
             </form>
             
             <div class="forgot-password">
-                <a href="#">¿Olvidaste tu contraseña?</a>
+                <a href="#" onclick="handleForgotPassword(event)">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div class="health-icons">
+                <i class="fas fa-heartbeat"></i>
+                <i class="fas fa-user-md"></i>
+                <i class="fas fa-hospital"></i>
+                <i class="fas fa-ambulance"></i>
             </div>
         </div>
-        
-        <div class="hospital-info">
-            <p>Hospital Pastor Oropeza - IVSS</p>
-            <p>Sistema de Gestión, Registro e Historia Clínica de Pacientes</p>
+
+        <!-- Elementos decorativos flotantes -->
+        <div class="floating-icons">
+            <i class="fas fa-plus-circle"></i>
+            <i class="fas fa-heart"></i>
+            <i class="fas fa-stethoscope"></i>
+            <i class="fas fa-capsules"></i>
+            <i class="fas fa-syringe"></i>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Animación de los íconos de salud
+        document.querySelectorAll('.health-icons i').forEach((icon, index) => {
+            icon.style.animation = `pulse 2s ${index * 0.2}s infinite`;
+        });
+
+        // Animación de los íconos flotantes
+        document.querySelectorAll('.floating-icons i').forEach((icon, index) => {
+            icon.style.animation = `float 3s ${index * 0.5}s infinite`;
+            icon.style.left = `${Math.random() * 100}%`;
+            icon.style.top = `${Math.random() * 100}%`;
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Aquí iría la lógica de autenticación
             // Por ahora, simplemente redirigimos al dashboard
             window.location.href = 'dashboard.html';
+        }
+
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            // Aquí iría la lógica para recuperar contraseña
+            alert('Función de recuperación de contraseña en desarrollo');
+        }
+
+        // Efecto de parallax en los íconos flotantes
+        document.addEventListener('mousemove', (e) => {
+            const icons = document.querySelectorAll('.floating-icons i');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            icons.forEach((icon) => {
+                const speed = 30;
+                const x = (window.innerWidth - e.pageX * speed) / 100;
+                const y = (window.innerHeight - e.pageY * speed) / 100;
+
+                icon.style.transform = `translate(${x}px, ${y}px)`;
+            });
         });
     </script>
+
+    <style>
+        .health-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .floating-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-icons i {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 2rem;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
 </body>
 </html> 

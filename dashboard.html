@@ -111,20 +111,22 @@
             flex-direction: row;
             justify-content: flex-start;
             align-items: flex-start;
-            padding: 2rem;
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 2rem auto;
+            padding: 3rem;
+            gap: 3rem;
+            max-width: 1600px;
+            margin: 1rem auto;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            min-height: calc(100vh - 12rem);
         }
 
         .department-view-container {
             flex: 3;
             min-width: 60%;
             text-align: left;
+            padding: 1rem;
         }
 
         .calendar-section {
@@ -135,6 +137,9 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             text-align: center;
             transition: all 0.3s ease;
+            padding: 2rem;
+            max-height: calc(100vh - 8rem);
+            overflow-y: auto;
         }
 
         .calendar-header {
@@ -166,6 +171,7 @@
             grid-template-columns: repeat(7, 1fr);
             gap: 5px;
             text-align: center;
+            margin-bottom: 2rem;
         }
 
         .calendar-day-header {
@@ -183,6 +189,7 @@
             font-size: 0.9rem;
             color: #333;
             position: relative;
+            margin-bottom: 1.5rem;
         }
 
         .calendar-day:hover {
@@ -229,8 +236,9 @@
             margin-top: 1.5rem;
             text-align: left;
             border-top: 1px solid #eee;
-            padding-top: 1rem;
-            transition: border-color 0.3s ease;
+            padding: 1rem;
+            background: white;
+            border-radius: 0 0 20px 20px;
         }
 
         .selected-day-patients-list h4 {
@@ -611,6 +619,130 @@
         .animate-fade-out {
             animation: fadeOut 0.3s ease-out forwards;
         }
+
+        /* Agregar estilos para los nuevos indicadores */
+        .calendar-day.has-medication-records {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            position: relative;
+        }
+
+        .calendar-day.has-medication-records::after {
+            content: '✓';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            color: #2ecc71;
+            font-size: 0.8rem;
+        }
+
+        .calendar-day.future-date {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.today-highlight {
+            background-color: #d9534f;
+            color: white;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .calendar-day.today-highlight::after {
+            content: 'Hoy';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #d9534f;
+            white-space: nowrap;
+        }
+
+        .manage-button {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .manage-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .bed-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .patient-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .patient-stat {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .department-header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .patient-stat {
+            transition: all 0.3s ease;
+        }
+
+        .patient-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animaciones */
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -618,7 +750,22 @@
     <div id="patientManagementModal" class="modal-backdrop">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle" class="text-xl font-semibold text-white"></h2>
+                <div class="flex flex-col w-full">
+                    <h2 id="modalTitle" class="text-xl font-semibold text-white mb-2">
+                        Gestión de Paciente:
+                    </h2>
+                    <div class="flex items-center gap-4">
+                        <label class="text-white text-sm">Fecha:</label>
+                        <input type="date" 
+                               id="medicationDate" 
+                               class="px-2 py-1 rounded text-gray-800" 
+                               value="${selectedDateForManagement || today}"
+                               max="${today}">
+                        <span class="text-white text-sm ml-2">
+                            (Solo se pueden registrar medicamentos hasta el día actual)
+                        </span>
+                    </div>
+                </div>
                 <button onclick="closeModal()" class="text-white hover:text-gray-200">
                     <i class="fas fa-times"></i>
                 </button>
@@ -884,9 +1031,115 @@
         let currentPatient = null;
         let selectedDateForManagement = null;
 
+        // Cargar datos guardados del localStorage al iniciar
+        function loadSavedData() {
+            const savedData = localStorage.getItem('hospitalData');
+            if (savedData) {
+                Object.assign(hospitalData, JSON.parse(savedData));
+            }
+        }
+
+        // Guardar datos en localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('hospitalData', JSON.stringify(hospitalData));
+        }
+
+        // Función para formatear fecha YYYY-MM-DD
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Función para verificar si un día tiene registros de medicamentos
+        function hasMedicationRecords(date) {
+            for (const dept in hospitalData) {
+                for (const room of hospitalData[dept].rooms) {
+                    for (const bed of room.beds) {
+                        if (bed.medicationsStatus && bed.medicationsStatus[date]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Función para mostrar el modal
+        function showPatientManagement(patient) {
+            currentPatient = patient;
+            const modal = document.getElementById('patientManagementModal');
+            document.body.classList.add('modal-open');
+            modal.classList.add('show');
+            
+            // Obtener la fecha actual formateada
+            const today = formatDate(new Date());
+            
+            // Actualizar título y agregar selector de fecha
+            const modalHeader = document.querySelector('.modal-header');
+            modalHeader.innerHTML = `
+                <div class="flex flex-col w-full">
+                    <h2 id="modalTitle" class="text-xl font-semibold text-white mb-2">
+                        Gestión de Paciente: ${patient.patient}
+                    </h2>
+                    <div class="flex items-center gap-4">
+                        <label class="text-white text-sm">Fecha:</label>
+                        <input type="date" 
+                               id="medicationDate" 
+                               class="px-2 py-1 rounded text-gray-800" 
+                               value="${selectedDateForManagement || today}"
+                               max="${today}">
+                        <span class="text-white text-sm ml-2">
+                            (Solo se pueden registrar medicamentos hasta el día actual)
+                        </span>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            // Agregar event listener para el cambio de fecha
+            document.getElementById('medicationDate').addEventListener('change', function(e) {
+                const selectedDate = new Date(e.target.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate > today) {
+                    showNotification('No se pueden registrar medicamentos para fechas futuras', 'error');
+                    e.target.value = formatDate(today);
+                    selectedDateForManagement = formatDate(today);
+                } else {
+                    selectedDateForManagement = e.target.value;
+                }
+                updateModalContent();
+            });
+
+            // Establecer la fecha inicial
+            selectedDateForManagement = today;
+            updateModalContent();
+        }
+
+        // Función para actualizar el contenido del modal según la fecha
+        function updateModalContent() {
+            if (!currentPatient || !selectedDateForManagement) return;
+
+            // Obtener el estado de los medicamentos para la fecha seleccionada
+            const medicationsStatus = currentPatient.medicationsStatus?.[selectedDateForManagement] || {};
+            
+            // Renderizar medicamentos con su estado
+            renderMedicationsInModal(currentPatient.medications, medicationsStatus);
+            
+            // Cargar las notas del día seleccionado
+            document.getElementById('patientNotes').value = 
+                currentPatient.dailyNotes?.[selectedDateForManagement] || '';
+        }
+
         // Función para actualizar el estado de un medicamento
         function updateMedicationStatus(bedId, medicationName, isChecked) {
-            const today = new Date().toISOString().split('T')[0];
+            if (!selectedDateForManagement) {
+                selectedDateForManagement = formatDate(new Date());
+            }
+            
+            let updated = false;
             
             // Actualizar en hospitalData
             for (const dept in hospitalData) {
@@ -897,55 +1150,30 @@
                             if (!bed.medicationsStatus) {
                                 bed.medicationsStatus = {};
                             }
-                            if (!bed.medicationsStatus[today]) {
-                                bed.medicationsStatus[today] = {};
+                            if (!bed.medicationsStatus[selectedDateForManagement]) {
+                                bed.medicationsStatus[selectedDateForManagement] = {};
                             }
                             // Actualizar el estado
-                            bed.medicationsStatus[today][medicationName] = isChecked;
+                            bed.medicationsStatus[selectedDateForManagement][medicationName] = isChecked;
+                            updated = true;
                         }
                     });
                 });
             }
 
-            // Mostrar notificación
-            showNotification(
-                `Medicamento ${medicationName} marcado como ${isChecked ? 'administrado' : 'no administrado'}`,
-                'success'
-            );
-        }
-
-        // Agregar event listener global para los checkboxes de medicamentos
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('medication-checkbox')) {
-                const bedId = e.target.dataset.bedId;
-                const medicationName = e.target.dataset.medication;
-                const isChecked = e.target.checked;
+            if (updated) {
+                // Guardar cambios en localStorage
+                saveDataToStorage();
                 
-                updateMedicationStatus(bedId, medicationName, isChecked);
-            }
-        });
+                // Mostrar notificación
+                showNotification(
+                    `Medicamento ${medicationName} marcado como ${isChecked ? 'administrado' : 'no administrado'} para el día ${selectedDateForManagement}`,
+                    'success'
+                );
 
-        // Función para mostrar el modal
-        function showPatientManagement(patient) {
-            currentPatient = patient;
-            selectedDateForManagement = new Date().toISOString().split('T')[0];
-            const modal = document.getElementById('patientManagementModal');
-            document.body.classList.add('modal-open');
-            modal.classList.add('show');
-            
-            // Actualizar título del modal
-            document.getElementById('modalTitle').textContent = 
-                `Gestión de Paciente ${patient.patient} (${selectedDateForManagement})`;
-            
-            // Obtener el estado de los medicamentos para la fecha actual
-            const medicationsStatus = patient.medicationsStatus?.[selectedDateForManagement] || {};
-            
-            // Renderizar medicamentos con su estado
-            renderMedicationsInModal(patient.medications, medicationsStatus);
-            
-            // Cargar las notas del día
-            document.getElementById('patientNotes').value = 
-                patient.dailyNotes?.[selectedDateForManagement] || '';
+                // Actualizar el calendario si hay cambios
+                renderCalendar();
+            }
         }
 
         // Función para renderizar medicamentos en el modal
@@ -1004,6 +1232,9 @@
                         displayDepartmentDetails(hospitalData[departmentKey]);
                     }
                     
+                    // Guardar cambios
+                    saveDataToStorage();
+                    
                     showNotification('Medicamento eliminado correctamente', 'success');
                 });
             });
@@ -1017,20 +1248,33 @@
             welcomeContent.classList.add('hidden');
             departmentDetailsDiv.classList.remove('hidden');
 
-            let detailsHtml = `<h3 class="text-2xl font-bold mb-6">${department.name}</h3>`;
+            let detailsHtml = `
+                <div class="department-header slide-in">
+                    <h3 class="text-2xl font-bold mb-6">
+                        <i class="${getDepartmentIcon(department.name)}"></i>
+                        ${department.name}
+                    </h3>
+                </div>`;
 
             department.rooms.forEach(room => {
                 detailsHtml += `
-                    <div class="room-card bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <h4 class="text-xl font-bold mb-4">Sala ${room.id}</h4>
+                    <div class="department-card fade-in">
+                        <h4 class="text-xl font-bold mb-4">
+                            <i class="fas fa-door-open text-primary-color"></i>
+                            Sala ${room.id}
+                        </h4>
                         <div class="bed-list space-y-4">
                 `;
 
                 room.beds.forEach(bed => {
+                    const occupancyStatus = bed.patient ? 'occupied' : 'available';
                     detailsHtml += `
-                        <div class="bed-item bg-white p-4 rounded-lg relative">
+                        <div class="bed-card ${occupancyStatus}">
                             <div class="flex justify-between items-start mb-3">
-                                <p class="text-red-500 font-semibold">Cama: ${bed.id}</p>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-bed text-primary-color"></i>
+                                    <p class="text-red-500 font-semibold">Cama: ${bed.id}</p>
+                                </div>
                                 <button onclick='showPatientManagement(${JSON.stringify({
                                     id: bed.id,
                                     patient: bed.patient,
@@ -1040,35 +1284,50 @@
                                     medications: bed.medications || [],
                                     medicationsStatus: bed.medicationsStatus || {},
                                     dailyNotes: bed.dailyNotes || {}
-                                })})' 
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                })})'
+                                    class="manage-button">
+                                    <i class="fas fa-user-md"></i>
                                     Gestionar
                                 </button>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p class="mb-1"><strong>Paciente:</strong> ${bed.patient}</p>
-                                    <p class="mb-1"><strong>Ingreso:</strong> ${bed.admissionDate}</p>
+                            <div class="patient-info">
+                                <div class="patient-stat">
+                                    <i class="fas fa-user"></i>
+                                    <span><strong>Paciente:</strong> ${bed.patient}</span>
                                 </div>
-                                <div>
-                                    <p class="mb-1"><strong>Motivo:</strong> ${bed.reason}</p>
-                                    <p class="mb-1"><strong>Tipo de Sangre:</strong> ${bed.bloodType}</p>
+                                <div class="patient-stat">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span><strong>Ingreso:</strong> ${bed.admissionDate}</span>
+                                </div>
+                                <div class="patient-stat">
+                                    <i class="fas fa-notes-medical"></i>
+                                    <span><strong>Motivo:</strong> ${bed.reason}</span>
+                                </div>
+                                <div class="patient-stat">
+                                    <i class="fas fa-tint"></i>
+                                    <span><strong>Tipo de Sangre:</strong> ${bed.bloodType}</span>
                                 </div>
                             </div>
                             <div class="mt-4">
-                                <p class="font-medium mb-2">Medicamentos:</p>
-                                <div class="space-y-2">
+                                <p class="font-medium mb-2">
+                                    <i class="fas fa-pills"></i>
+                                    Medicamentos:
+                                </p>
+                                <div class="medications-grid">
                                     ${(bed.medications || []).map(med => {
                                         const today = new Date().toISOString().split('T')[0];
                                         const isTaken = bed.medicationsStatus?.[today]?.[med] || false;
                                         return `
-                                            <div class="flex items-center gap-2 bg-white p-2 rounded border">
-                                                <input type="checkbox" 
-                                                       class="medication-checkbox form-checkbox h-4 w-4 text-blue-600 cursor-pointer" 
-                                                       data-bed-id="${bed.id}"
-                                                       data-medication="${med}"
-                                                       ${isTaken ? 'checked' : ''}>
-                                                <label class="flex-grow cursor-pointer">${med}</label>
+                                            <div class="medication-item ${isTaken ? 'taken' : ''}">
+                                                <div class="med-info">
+                                                    <input type="checkbox" 
+                                                           class="medication-checkbox" 
+                                                           data-bed-id="${bed.id}"
+                                                           data-medication="${med}"
+                                                           ${isTaken ? 'checked' : ''}>
+                                                    <span>${med}</span>
+                                                </div>
+                                                <i class="fas ${isTaken ? 'fa-check-circle text-green-500' : 'fa-times-circle text-gray-400'}"></i>
                                             </div>
                                         `;
                                     }).join('')}
@@ -1085,6 +1344,23 @@
             });
 
             departmentDetailsDiv.innerHTML = detailsHtml;
+
+            // Añadir animaciones
+            const cards = document.querySelectorAll('.department-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Función para obtener el ícono del departamento
+        function getDepartmentIcon(departmentName) {
+            const icons = {
+                'Traumatología': 'fas fa-bone',
+                'Ginecología': 'fas fa-venus',
+                'Pediatría': 'fas fa-child',
+                'Medicina Interna': 'fas fa-stethoscope'
+            };
+            return icons[departmentName] || 'fas fa-hospital';
         }
 
         // Manejador de eventos para los botones de departamento
@@ -1117,6 +1393,9 @@
 
         let currentDate = new Date();
 
+        // Agregar variable para mantener el día seleccionado
+        let selectedCalendarDate = null;
+
         function renderCalendar() {
             const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -1144,34 +1423,36 @@
             }
 
             // Agregar días del mes actual
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const dayDiv = document.createElement('div');
+                const currentDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                const dateStr = formatDate(currentDateObj);
+                
                 dayDiv.className = 'calendar-day current-month';
                 dayDiv.textContent = day;
-                
-                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 dayDiv.dataset.date = dateStr;
 
                 // Marcar el día actual
-                if (day === new Date().getDate() && 
-                    currentDate.getMonth() === new Date().getMonth() && 
-                    currentDate.getFullYear() === new Date().getFullYear()) {
+                if (currentDateObj.getTime() === today.getTime()) {
                     dayDiv.classList.add('today-highlight');
                 }
 
-                // Verificar si hay pacientes en este día
-                let hasPatients = false;
-                for (const dept in hospitalData) {
-                    hospitalData[dept].rooms.forEach(room => {
-                        room.beds.forEach(bed => {
-                            if (bed.admissionDate === dateStr) {
-                                hasPatients = true;
-                            }
-                        });
-                    });
+                // Marcar el día seleccionado
+                if (dateStr === selectedCalendarDate) {
+                    dayDiv.classList.add('selected-day');
                 }
-                if (hasPatients) {
-                    dayDiv.classList.add('has-patient');
+
+                // Marcar días pasados con registros de medicamentos
+                if (currentDateObj < today && hasMedicationRecords(dateStr)) {
+                    dayDiv.classList.add('has-medication-records');
+                }
+
+                // Marcar días futuros con un estilo diferente
+                if (currentDateObj > today) {
+                    dayDiv.classList.add('future-date');
                 }
 
                 dayDiv.addEventListener('click', () => showPatientsForDay(dateStr));
@@ -1180,6 +1461,19 @@
         }
 
         function showPatientsForDay(dateStr) {
+            const selectedDate = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate > today) {
+                showNotification('No se pueden ver registros de fechas futuras', 'error');
+                return;
+            }
+
+            // Actualizar el día seleccionado y refrescar el calendario
+            selectedCalendarDate = dateStr;
+            renderCalendar();
+
             const selectedDayPatientsList = document.getElementById('selectedDayPatientsList');
             const patientsOnSelectedDayDiv = document.getElementById('patientsOnSelectedDay');
             const selectedDateDisplay = document.getElementById('selectedDateDisplay');
@@ -1192,16 +1486,65 @@
             for (const dept in hospitalData) {
                 hospitalData[dept].rooms.forEach(room => {
                     room.beds.forEach(bed => {
-                        if (bed.admissionDate === dateStr) {
+                        // Mostrar el paciente si:
+                        // 1. Fue ingresado en esta fecha
+                        // 2. Tiene registros de medicamentos para esta fecha
+                        // 3. La fecha seleccionada es posterior o igual a su fecha de ingreso
+                        if (bed.admissionDate === dateStr || 
+                            (bed.medicationsStatus && bed.medicationsStatus[dateStr]) ||
+                            (bed.admissionDate && bed.admissionDate <= dateStr)) {
+                            
                             patientsFound = true;
                             const patientItem = document.createElement('div');
                             patientItem.className = 'selected-day-patient-item';
-                            patientItem.innerHTML = `
+
+                            // Información básica del paciente
+                            let patientHtml = `
                                 <p><strong>Paciente:</strong> ${bed.patient}</p>
                                 <p><strong>Cama:</strong> ${bed.id}</p>
                                 <p><strong>Departamento:</strong> ${hospitalData[dept].name}</p>
                                 <p><strong>Motivo:</strong> ${bed.reason}</p>
+                                <p><strong>Fecha de ingreso:</strong> ${bed.admissionDate}</p>
                             `;
+
+                            // Mostrar estado de medicamentos para el día seleccionado
+                            if (bed.medications && bed.medications.length > 0) {
+                                patientHtml += `<div class="mt-3">
+                                    <p class="font-medium mb-2">Estado de Medicamentos:</p>
+                                    <div class="medications-status space-y-1">`;
+
+                                bed.medications.forEach(med => {
+                                    const medicationStatus = bed.medicationsStatus?.[dateStr]?.[med];
+                                    const statusClass = medicationStatus ? 'text-green-600' : 'text-gray-500';
+                                    const statusIcon = medicationStatus ? 
+                                        '<i class="fas fa-check-circle"></i>' : 
+                                        '<i class="fas fa-times-circle"></i>';
+                                    
+                                    patientHtml += `
+                                        <div class="flex items-center gap-2 ${statusClass}">
+                                            ${statusIcon}
+                                            <span>${med}</span>
+                                            <span class="ml-2 text-sm">
+                                                ${medicationStatus ? '(Administrado)' : '(No administrado)'}
+                                            </span>
+                                        </div>`;
+                                });
+
+                                patientHtml += `</div></div>`;
+                            }
+
+                            // Mostrar notas del día si existen
+                            if (bed.dailyNotes && bed.dailyNotes[dateStr]) {
+                                patientHtml += `
+                                    <div class="mt-3">
+                                        <p class="font-medium">Notas del día:</p>
+                                        <p class="text-gray-600 bg-gray-50 p-2 rounded mt-1">
+                                            ${bed.dailyNotes[dateStr]}
+                                        </p>
+                                    </div>`;
+                            }
+
+                            patientItem.innerHTML = patientHtml;
                             patientsOnSelectedDayDiv.appendChild(patientItem);
                         }
                     });
@@ -1209,7 +1552,7 @@
             }
             
             if (!patientsFound) {
-                patientsOnSelectedDayDiv.innerHTML = '<p class="text-center text-gray-600">No hay pacientes ingresados en esta fecha.</p>';
+                patientsOnSelectedDayDiv.innerHTML = '<p class="text-center text-gray-600">No hay pacientes ni registros de medicamentos para esta fecha.</p>';
             }
             
             selectedDayPatientsList.classList.remove('hidden');
@@ -1345,6 +1688,9 @@
                 });
             }
 
+            // Guardar cambios en localStorage
+            saveDataToStorage();
+
             // Cerrar modal y actualizar vista
             closeModal();
             
@@ -1395,6 +1741,85 @@
                 closeModal();
             }
         });
+
+        // Cargar datos guardados al iniciar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
+            renderCalendar();
+        });
+
+        // Actualizar los estilos
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            .calendar-day {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            .calendar-day.has-medication-records {
+                background-color: rgba(46, 204, 113, 0.1);
+                border: 1px solid rgba(46, 204, 113, 0.3);
+            }
+
+            .calendar-day.has-medication-records::after {
+                content: '✓';
+                position: absolute;
+                bottom: 2px;
+                right: 2px;
+                color: #2ecc71;
+                font-size: 0.8rem;
+            }
+
+            .calendar-day.future-date {
+                background-color: #f5f5f5;
+                color: #999;
+                cursor: not-allowed;
+            }
+
+            .calendar-day.today-highlight {
+                background-color: #d9534f;
+                color: white;
+                font-weight: bold;
+            }
+
+            .calendar-day.today-highlight::after {
+                content: 'Hoy';
+                position: absolute;
+                bottom: -1.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.7rem;
+                color: #d9534f;
+                white-space: nowrap;
+            }
+
+            .calendar-day.selected-day {
+                background-color: #3498db;
+                color: white;
+                font-weight: bold;
+                transform: scale(1.1);
+                box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+                z-index: 1;
+            }
+
+            .calendar-day.selected-day::after {
+                content: 'Seleccionado';
+                position: absolute;
+                bottom: -1.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.7rem;
+                color: #3498db;
+                white-space: nowrap;
+            }
+
+            .calendar-day:not(.future-date):hover {
+                transform: scale(1.1);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                z-index: 1;
+            }
+        `;
+        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html> 
