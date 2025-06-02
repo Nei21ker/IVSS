@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal de Guardia - IVSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #d9534f;
+            --primary-hover: #c9302c;
+            --secondary-color: #26a69a;
+            --secondary-hover: #2bbbad;
+            --background-light: #f0f2f5;
+            --text-primary: #333;
+            --text-secondary: #666;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            padding: 1.25rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-top {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 1.875rem;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .departments-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .department-button {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .department-button:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .department-button.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+        }
+
+        .logout-button {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .logout-button:hover {
+            background-color: #f5c6cb;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2.5rem;
+            gap: 2.5rem;
+            max-width: 2400px;
+            margin: 1rem auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            min-height: calc(100vh - 12rem);
+            overflow-x: hidden;
+        }
+
+        .staff-section {
+            flex: 1;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .staff-section h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .staff-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .staff-card p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.2rem;
+        }
+
+        .staff-card strong {
+            color: var(--secondary-color);
+        }
+
+        .stopwatch-container {
+            margin-top: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .stopwatch-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .stopwatch-button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stopwatch-button:hover {
+            background-color: var(--secondary-hover);
+            transform: translateY(-1px);
+        }
+
+        .stopwatch-button.running {
+            background-color: #e74c3c; /* Red for stop state */
+        }
+
+        .stopwatch-button.running:hover {
+            background-color: #c0392b;
+        }
+
+        /* Dark Mode Styles (copied from dashboard.html for consistency) */
+        body.dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .dashboard-header {
+            background-color: #2d3748;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .main-content {
+            background-color: #2d3748;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .staff-section {
+            background-color: #2d3748;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .staff-card {
+            background: #2d3748;
+            border-color: #4a5568;
+        }
+
+        body.dark-mode .staff-card p {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .stopwatch-display {
+            color: var(--secondary-color);
+        }
+        body.dark-mode .stopwatch-button {
+            background-color: #34495e;
+        }
+        body.dark-mode .stopwatch-button:hover {
+            background-color: #2c3e50;
+        }
+        body.dark-mode .stopwatch-button.running {
+            background-color: #e74c3c;
+        }
+        body.dark-mode .stopwatch-button.running:hover {
+            background-color: #c0392b;
+        }
+
+        .theme-toggle-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle-button:hover {
+            color: #f0f0f0;
+        }
+
+        /* Estilos para el modal de gestión de personal */
+        .staff-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .staff-modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 32rem;
+            margin: 1rem;
+            position: relative;
+            animation: modalFadeIn 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .staff-modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .staff-modal-body {
+            padding: 2rem;
+        }
+
+        .staff-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .staff-modal-backdrop.show {
+            display: flex;
+        }
+
+        /* Dark mode for staff modal */
+        body.dark-mode .staff-modal-content {
+            background: #2d3748;
+        }
+        body.dark-mode .staff-modal-header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        body.dark-mode .staff-modal-body label {
+            color: #e2e8f0;
+        }
+        body.dark-mode .staff-modal-body input,
+        body.dark-mode .staff-modal-body textarea {
+            background-color: #1a202c;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.dark-mode .staff-modal-footer {
+            border-top: 1px solid #4a5568;
+        }
+
+        /* Calendar Styles (copied from dashboard.html) */
+        .calendar-section {
+            flex: 2;
+            flex-basis: 0;
+            min-width: 450px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        .calendar-header button {
+            background-color: #d9534f;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-header button:hover {
+            background-color: #c9302c;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0;
+            width: calc((7 * 50px) + (6 * 5px));
+            margin: 0 auto;
+        }
+
+        .calendar-day-header {
+            font-weight: 700;
+            color: #555;
+            padding: 0.5rem;
+            box-sizing: border-box;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day {
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            color: #333;
+            position: relative;
+            padding-bottom: 2.2rem;
+            box-sizing: border-box;
+        }
+
+        .calendar-day:hover {
+            background-color: rgba(217, 83, 79, 0.1);
+            border: 1px solid rgba(217, 83, 79, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-day.current-month {
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .calendar-day.other-month {
+            visibility: hidden;
+        }
+
+        .calendar-day.selected-day {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            z-index: 1;
+            transform: none;
+        }
+
+        .calendar-day.selected-day::after {
+            content: none;
+        }
+
+        .calendar-day.selected-day::before {
+            content: none;
+        }
+
+        .calendar-day.today-highlight.selected-day::after {
+            content: 'Hoy';
+            bottom: 0.2rem;
+            color: white;
+        }
+
+        .calendar-day.today-highlight.selected-day::before {
+            content: none;
+        }
+
+        .calendar-day > div {
+            position: relative;
+            z-index: 1;
+        }
+
+        .calendar-day.has-duty-hours::after {
+            content: '✓'; /* Placeholder for duty hours indicator */
+            position: absolute;
+            bottom: 1.5rem;
+            right: 2px;
+            color: #2ecc71;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+
+        .calendar-day.future-date {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .calendar-day.today-highlight {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 0 0 2px var(--primary-color);
+            transform: none;
+        }
+
+        .calendar-day.today-highlight::after {
+            content: none;
+            position: absolute;
+            bottom: 0.2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: white;
+            white-space: nowrap;
+            background-color: transparent;
+        }
+
+        .calendar-day:not(.future-date):hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .selected-day-staff-list {
+            margin-top: 1.5rem;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding: 1rem;
+            background: white;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .selected-day-staff-list h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.75rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .selected-day-staff-item {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .selected-day-staff-item p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .selected-day-staff-item strong {
+            color: #d9534f;
+        }
+
+        /* Dark mode calendar styles */
+        body.dark-mode .calendar-section {
+            background-color: #2d3748;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .calendar-header {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .calendar-day-header {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .calendar-day.current-month {
+            background-color: #4a5568;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .calendar-day.other-month {
+            background-color: #2d3748;
+            color: #a0aec0;
+        }
+
+        body.dark-mode .calendar-day:hover {
+            background-color: #636b6f;
+        }
+
+        body.dark-mode .selected-day-staff-list {
+            border-top-color: #4a5568;
+        }
+
+        body.dark-mode .selected-day-staff-list h4 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .selected-day-staff-item {
+            background-color: #4a5568;
+            border-color: #636b6f;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .selected-day-staff-item p {
+            color: #cbd5e0;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Staff Management Modal -->
+    <div id="staffManagementModal" class="staff-modal-backdrop">
+        <div class="staff-modal-content">
+            <div class="staff-modal-header">
+                <h2 id="staffModalTitle" class="text-xl font-semibold">Gestión de Personal</h2>
+                <button onclick="closeStaffModal()" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="staff-modal-body">
+                <input type="hidden" id="staffId">
+                <input type="hidden" id="staffType">
+
+                <div class="mb-4">
+                    <label for="staffName" class="block text-gray-700 text-sm font-bold mb-2">Nombre:</label>
+                    <input type="text" id="staffName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="staffPhone" class="block text-gray-700 text-sm font-bold mb-2">Teléfono:</label>
+                    <input type="text" id="staffPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="staffEmail" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                    <input type="email" id="staffEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div id="staffSpecialtyGroup" class="mb-4 hidden">
+                    <label for="staffSpecialty" class="block text-gray-700 text-sm font-bold mb-2">Especialidad:</label>
+                    <input type="text" id="staffSpecialty" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="staffRooms" class="block text-gray-700 text-sm font-bold mb-2">Salas a Cargo (separadas por coma):</label>
+                    <input type="text" id="staffRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+            <div class="staff-modal-footer">
+                <button onclick="closeStaffModal()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium">
+                    Cancelar
+                </button>
+                <button onclick="saveStaffChanges()" class="px-6 py-2 bg-[#26a69a] text-white rounded-lg hover:bg-[#2bbbad] font-medium">
+                    Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="dashboard-header">
+        <div class="header-top">
+            <h1 class="header-title">Personal de Guardia</h1>
+            <div class="header-actions">
+                <div class="flex-1 text-right">
+                    <button id="logoutBtn" class="logout-button mr-2">Cerrar Sesión</button>
+                    <button id="backToDashboardBtn" class="logout-button mr-2">Volver al Dashboard</button>
+                    <button id="themeToggleBtn" class="theme-toggle-button">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <nav class="departments-nav">
+            <a href="#" class="department-button active" data-department="traumatologia">
+                <i class="fas fa-bone"></i> Traumatología
+            </a>
+            <a href="#" class="department-button" data-department="ginecologia">
+                <i class="fas fa-venus"></i> Ginecología
+            </a>
+            <a href="#" class="department-button" data-department="pediatria">
+                <i class="fas fa-child"></i> Pediatría
+            </a>
+            <a href="#" class="department-button" data-department="medicina_interna">
+                <i class="fas fa-stethoscope"></i> Medicina Interna
+            </a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div id="nursesSection" class="staff-section">
+            <h3>Enfermeras</h3>
+            <div id="nursesList" class="space-y-4">
+                <!-- Nurses will be loaded here -->
+            </div>
+        </div>
+
+        <div id="doctorsSection" class="staff-section">
+            <h3>Doctores</h3>
+            <div id="doctorsList" class="space-y-4">
+                <!-- Doctors will be loaded here -->
+            </div>
+        </div>
+
+        <div id="calendarSection" class="calendar-section">
+            <div class="calendar-header">
+                <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                <span id="currentMonthYear"></span>
+                <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- El calendario se llenará dinámicamente -->
+            </div>
+            <div id="selectedDayStaffList" class="selected-day-staff-list hidden">
+                <h4>Horas de Guardia del <span id="selectedDateDisplay"></span>:</h4>
+                <div id="staffOnSelectedDay">
+                    <!-- La lista de personal se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const staffData = {
+            traumatologia: {
+                nurses: [
+                    { id: "N-T-001", name: "Elena Rojas", phone: "0414-1234567", email: "elena.rojas@ivss.com", rooms: ["T-01", "T-02"] },
+                    { id: "N-T-002", name: "Pedro Gil", phone: "0426-7654321", email: "pedro.gil@ivss.com", rooms: ["T-03"] }
+                ],
+                doctors: [
+                    { id: "D-T-001", name: "Dr. Ricardo Soto", specialty: "Traumatología", phone: "0416-1122334", email: "ricardo.soto@ivss.com", rooms: ["T-01"] },
+                    { id: "D-T-002", name: "Dra. Ana Bolívar", specialty: "Traumatología", phone: "0424-9988776", email: "ana.bolivar@ivss.com", rooms: ["T-02", "T-03"] }
+                ]
+            },
+            ginecologia: {
+                nurses: [
+                    { id: "N-G-001", name: "Sofia Medina", phone: "0414-2345678", email: "sofia.medina@ivss.com", rooms: ["G-01"] },
+                    { id: "N-G-002", name: "Carlos Pérez", phone: "0426-8765432", email: "carlos.perez@ivss.com", rooms: ["G-02", "G-03"] }
+                ],
+                doctors: [
+                    { id: "D-G-001", name: "Dra. María Colmenares", specialty: "Ginecología", phone: "0416-2233445", email: "maria.colmenares@ivss.com", rooms: ["G-01", "G-02"] },
+                    { id: "D-G-002", name: "Dr. Luis Rivas", specialty: "Ginecología", phone: "0424-8877665", email: "luis.rivas@ivss.com", rooms: ["G-03"] }
+                ]
+            },
+            pediatria: {
+                nurses: [
+                    { id: "N-P-001", name: "Laura Flores", phone: "0414-3456789", email: "laura.flores@ivss.com", rooms: ["P-01", "P-03"] },
+                    { id: "N-P-002", name: "Miguel Ángel", phone: "0426-9876543", email: "miguel.angel@ivss.com", rooms: ["P-02"] }
+                ],
+                doctors: [
+                    { id: "D-P-001", name: "Dra. Valentina Paz", specialty: "Pediatría", phone: "0416-3344556", email: "valentina.paz@ivss.com", rooms: ["P-01"] },
+                    { id: "D-P-002", name: "Dr. Andres Bello", specialty: "Pediatría", phone: "0424-7766554", email: "andres.bello@ivss.com", rooms: ["P-02", "P-03"] }
+                ]
+            },
+            medicina_interna: {
+                nurses: [
+                    { id: "N-MI-001", name: "Gabriela Soler", phone: "0414-4567890", email: "gabriela.soler@ivss.com", rooms: ["MI-01"] },
+                    { id: "N-MI-002", name: "Javier Blanco", phone: "0426-1098765", email: "javier.blanco@ivss.com", rooms: ["MI-02", "MI-03"] }
+                ],
+                doctors: [
+                    { id: "D-MI-001", name: "Dr. Daniel Vargas", specialty: "Medicina Interna", phone: "0416-4455667", email: "daniel.vargas@ivss.com", rooms: ["MI-01", "MI-02"] },
+                    { id: "D-MI-002", name: "Dra. Sofia Ramos", specialty: "Medicina Interna", phone: "0424-6655443", email: "sofia.ramos@ivss.com", rooms: ["MI-03"] }
+                ]
+            }
+        };
+
+        // Object to store stopwatch intervals and start times
+        const stopwatchStates = JSON.parse(localStorage.getItem('stopwatchStates')) || {};
+        const stopwatchIntervals = {};
+        const dailyDutyHours = JSON.parse(localStorage.getItem('dailyDutyHours')) || {};
+
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return [hours, minutes, seconds]
+                .map(unit => String(unit).padStart(2, '0'))
+                .join(':');
+        }
+
+        function updateStopwatchDisplay(staffId) {
+            const displayElement = document.getElementById(`stopwatch-display-${staffId}`);
+            if (!displayElement) return;
+
+            const state = stopwatchStates[staffId];
+            if (state && state.running && state.startTime) {
+                const elapsedSeconds = Math.floor((Date.now() - state.startTime) / 1000);
+                displayElement.textContent = formatTime(elapsedSeconds);
+            } else if (state && state.elapsedOnStop) {
+                displayElement.textContent = formatTime(state.elapsedOnStop);
+            } else {
+                displayElement.textContent = '00:00:00';
+            }
+        }
+
+        function startStopwatch(staffId) {
+            const button = document.getElementById(`stopwatch-button-${staffId}`);
+
+            if (!stopwatchStates[staffId]) {
+                stopwatchStates[staffId] = { running: false, startTime: null, elapsedOnStop: 0 };
+            }
+
+            if (stopwatchStates[staffId].running) {
+                // Stop the stopwatch
+                clearInterval(stopwatchIntervals[staffId]);
+                delete stopwatchIntervals[staffId];
+                stopwatchStates[staffId].running = false;
+                const elapsedToday = Math.floor((Date.now() - stopwatchStates[staffId].startTime) / 1000);
+                stopwatchStates[staffId].elapsedOnStop = elapsedToday;
+                button.classList.remove('running');
+                button.innerHTML = '<i class="fas fa-play"></i> Iniciar Guardia';
+
+                // Save daily duty hours
+                const today = formatDate(new Date());
+                if (!dailyDutyHours[staffId]) dailyDutyHours[staffId] = {};
+                dailyDutyHours[staffId][today] = (dailyDutyHours[staffId][today] || 0) + elapsedToday; // Add elapsed time to current day
+                localStorage.setItem('dailyDutyHours', JSON.stringify(dailyDutyHours));
+
+            } else {
+                // Start the stopwatch
+                stopwatchStates[staffId].startTime = Date.now() - (stopwatchStates[staffId].elapsedOnStop * 1000);
+                stopwatchStates[staffId].running = true;
+                button.classList.add('running');
+                button.innerHTML = '<i class="fas fa-pause"></i> Detener Guardia';
+
+                stopwatchIntervals[staffId] = setInterval(() => {
+                    updateStopwatchDisplay(staffId);
+                }, 1000);
+            }
+            localStorage.setItem('stopwatchStates', JSON.stringify(stopwatchStates));
+            updateStopwatchDisplay(staffId); // Initial update
+        }
+
+        function resetStopwatch(staffId) {
+            clearInterval(stopwatchIntervals[staffId]);
+            delete stopwatchIntervals[staffId];
+            stopwatchStates[staffId] = { running: false, startTime: null, elapsedOnStop: 0 };
+            localStorage.setItem('stopwatchStates', JSON.stringify(stopwatchStates));
+            updateStopwatchDisplay(staffId);
+            const button = document.getElementById(`stopwatch-button-${staffId}`);
+            button.classList.remove('running');
+            button.innerHTML = '<i class="fas fa-play"></i> Iniciar Guardia';
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function renderStaff(departmentKey) {
+            const department = staffData[departmentKey];
+            const nursesListDiv = document.getElementById('nursesList');
+            const doctorsListDiv = document.getElementById('doctorsList');
+
+            nursesListDiv.innerHTML = '';
+            doctorsListDiv.innerHTML = '';
+
+            // Render Nurses
+            if (department.nurses) {
+                department.nurses.forEach(nurse => {
+                    const nurseCard = document.createElement('div');
+                    nurseCard.className = 'staff-card';
+                    const nurseId = `nurse-${nurse.id}`;
+                    nurseCard.innerHTML = `
+                        <p><strong>ID:</strong> ${nurse.id}</p>
+                        <p><strong>Nombre:</strong> ${nurse.name}</p>
+                        <p><strong>Teléfono:</strong> ${nurse.phone}</p>
+                        <p><strong>Email:</strong> ${nurse.email}</p>
+                        <p><strong>Salas a Cargo Hoy:</strong> ${nurse.rooms.join(', ')}</p>
+                        <div class="stopwatch-container">
+                            <div id="stopwatch-display-${nurseId}" class="stopwatch-display">00:00:00</div>
+                            <div class="flex gap-2">
+                                <button id="stopwatch-button-${nurseId}" class="stopwatch-button">
+                                    <i class="fas fa-play"></i> Iniciar Guardia
+                                </button>
+                                <button id="reset-button-${nurseId}" class="stopwatch-button bg-gray-500 hover:bg-gray-600">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick='showStaffManagement("nurse", ${JSON.stringify(nurse)})' class="stopwatch-button mt-2 bg-blue-500 hover:bg-blue-600">
+                            <i class="fas fa-edit"></i> Gestionar
+                        </button>
+                    `;
+                    nursesListDiv.appendChild(nurseCard);
+                    document.getElementById(`stopwatch-button-${nurseId}`).addEventListener('click', () => startStopwatch(nurseId));
+                    document.getElementById(`reset-button-${nurseId}`).addEventListener('click', () => resetStopwatch(nurseId));
+                    updateStopwatchDisplay(nurseId);
+                    if (stopwatchStates[nurseId] && stopwatchStates[nurseId].running) {
+                        document.getElementById(`stopwatch-button-${nurseId}`).classList.add('running');
+                        document.getElementById(`stopwatch-button-${nurseId}`).innerHTML = '<i class="fas fa-pause"></i> Detener Guardia';
+                        stopwatchIntervals[nurseId] = setInterval(() => {
+                            updateStopwatchDisplay(nurseId);
+                        }, 1000);
+                    }
+                });
+            }
+
+            // Render Doctors
+            if (department.doctors) {
+                department.doctors.forEach(doctor => {
+                    const doctorCard = document.createElement('div');
+                    doctorCard.className = 'staff-card';
+                    const doctorId = `doctor-${doctor.id}`;
+                    doctorCard.innerHTML = `
+                        <p><strong>ID:</strong> ${doctor.id}</p>
+                        <p><strong>Nombre:</strong> ${doctor.name}</p>
+                        <p><strong>Especialidad:</strong> ${doctor.specialty}</p>
+                        <p><strong>Teléfono:</strong> ${doctor.phone}</p>
+                        <p><strong>Email:</strong> ${doctor.email}</p>
+                        <p><strong>Salas a Cargo Hoy:</strong> ${doctor.rooms.join(', ')}</p>
+                        <div class="stopwatch-container">
+                            <div id="stopwatch-display-${doctorId}" class="stopwatch-display">00:00:00</div>
+                            <div class="flex gap-2">
+                                <button id="stopwatch-button-${doctorId}" class="stopwatch-button">
+                                    <i class="fas fa-play"></i> Iniciar Guardia
+                                </button>
+                                <button id="reset-button-${doctorId}" class="stopwatch-button bg-gray-500 hover:bg-gray-600">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick='showStaffManagement("doctor", ${JSON.stringify(doctor)})' class="stopwatch-button mt-2 bg-blue-500 hover:bg-blue-600">
+                            <i class="fas fa-edit"></i> Gestionar
+                        </button>
+                    `;
+                    doctorsListDiv.appendChild(doctorCard);
+                    document.getElementById(`stopwatch-button-${doctorId}`).addEventListener('click', () => startStopwatch(doctorId));
+                    document.getElementById(`reset-button-${doctorId}`).addEventListener('click', () => resetStopwatch(doctorId));
+                    updateStopwatchDisplay(doctorId);
+                    if (stopwatchStates[doctorId] && stopwatchStates[doctorId].running) {
+                        document.getElementById(`stopwatch-button-${doctorId}`).classList.add('running');
+                        document.getElementById(`stopwatch-button-${doctorId}`).innerHTML = '<i class="fas fa-pause"></i> Detener Guardia';
+                        stopwatchIntervals[doctorId] = setInterval(() => {
+                            updateStopwatchDisplay(doctorId);
+                        }, 1000);
+                    }
+                });
+            }
+        }
+
+        // Event listener for department buttons
+        document.querySelectorAll('.department-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.department-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                const departmentKey = this.dataset.department;
+                renderStaff(departmentKey);
+            });
+        });
+
+        // Theme toggle functionality
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            themeIcon.className = 'fas fa-sun';
+        }
+
+        themeToggleBtn.addEventListener('click', toggleDarkMode);
+
+        // Back to Dashboard button
+        document.getElementById('backToDashboardBtn').addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
+        });
+
+        // Logout button
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        let currentStaffType = null;
+        let currentStaffId = null;
+
+        function showStaffManagement(type, staff) {
+            currentStaffType = type;
+            currentStaffId = staff.id;
+
+            const modal = document.getElementById('staffManagementModal');
+            document.body.classList.add('modal-open');
+            modal.classList.add('show');
+
+            document.getElementById('staffModalTitle').textContent = `Gestión de ${type === 'nurse' ? 'Enfermera' : 'Doctor'}: ${staff.name}`;
+            document.getElementById('staffId').value = staff.id;
+            document.getElementById('staffType').value = type;
+            document.getElementById('staffName').value = staff.name;
+            document.getElementById('staffPhone').value = staff.phone;
+            document.getElementById('staffEmail').value = staff.email;
+            const rooms = staff.rooms ? staff.rooms.join(', ') : '';
+            document.getElementById('staffRooms').value = rooms;
+
+            const specialtyGroup = document.getElementById('staffSpecialtyGroup');
+            const specialtyInput = document.getElementById('staffSpecialty');
+
+            if (type === 'doctor') {
+                specialtyGroup.classList.remove('hidden');
+                specialtyInput.value = staff.specialty || '';
+            } else {
+                specialtyGroup.classList.add('hidden');
+                specialtyInput.value = '';
+            }
+        }
+
+        function closeStaffModal() {
+            const modal = document.getElementById('staffManagementModal');
+            document.body.classList.remove('modal-open');
+            modal.classList.remove('show');
+            currentStaffType = null;
+            currentStaffId = null;
+        }
+
+        function saveStaffChanges() {
+            const staffId = document.getElementById('staffId').value;
+            const staffType = document.getElementById('staffType').value;
+            const name = document.getElementById('staffName').value.trim();
+            const phone = document.getElementById('staffPhone').value.trim();
+            const email = document.getElementById('staffEmail').value.trim();
+            const rooms = document.getElementById('staffRooms').value.split(',').map(room => room.trim()).filter(room => room !== '');
+            const specialty = document.getElementById('staffSpecialty').value.trim();
+
+            if (!name || !phone || !email || rooms.length === 0) {
+                alert('Por favor, complete todos los campos obligatorios (Nombre, Teléfono, Email, Salas a Cargo).');
+                return;
+            }
+
+            let updated = false;
+
+            for (const deptKey in staffData) {
+                const department = staffData[deptKey];
+                const staffList = staffType === 'nurse' ? department.nurses : department.doctors;
+
+                const staffIndex = staffList.findIndex(s => s.id === staffId);
+                if (staffIndex !== -1) {
+                    staffList[staffIndex].name = name;
+                    staffList[staffIndex].phone = phone;
+                    staffList[staffIndex].email = email;
+                    staffList[staffIndex].rooms = rooms;
+                    if (staffType === 'doctor') {
+                        staffList[staffIndex].specialty = specialty;
+                    }
+                    updated = true;
+                    break;
+                }
+            }
+
+            if (updated) {
+                localStorage.setItem('staffData', JSON.stringify(staffData));
+                closeStaffModal();
+                // Re-render the current department to reflect changes
+                const activeDepartmentButton = document.querySelector('.department-button.active');
+                if (activeDepartmentButton) {
+                    renderStaff(activeDepartmentButton.dataset.department);
+                } else {
+                    // If no department is active (e.g., first load), render traumatologia by default
+                    renderStaff('traumatologia');
+                }
+                alert('Cambios guardados exitosamente!');
+            } else {
+                alert('Error al guardar cambios.');
+            }
+        }
+
+        // Load staff data from localStorage on initial load
+        function loadStaffData() {
+            const savedStaffData = localStorage.getItem('staffData');
+            if (savedStaffData) {
+                Object.assign(staffData, JSON.parse(savedStaffData));
+            }
+        }
+
+        // Calendar functionality (copied from dashboard.html and adapted)
+        const MONTH_NAMES = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+        const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+        let currentCalendarDate = new Date();
+        let selectedCalendarDate = null;
+
+        function renderCalendar() {
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+            
+            document.getElementById('currentMonthYear').textContent = 
+                `${MONTH_NAMES[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            // Add day headers
+            DAYS.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            // Add days from previous month
+            const firstDayIndex = firstDay.getDay();
+            for (let i = 0; i < firstDayIndex; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day other-month';
+                calendarGrid.appendChild(dayDiv);
+            }
+
+            // Clear any previously selected day before re-rendering
+            document.querySelectorAll('.calendar-day.selected-day').forEach(el => {
+                el.classList.remove('selected-day');
+            });
+
+            // Add days of current month
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dayDiv = document.createElement('div');
+                const dateObj = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), day);
+                const dateStr = formatDate(dateObj);
+                
+                dayDiv.className = 'calendar-day current-month';
+                dayDiv.textContent = day;
+                dayDiv.dataset.date = dateStr;
+
+                // Mark current day
+                if (dateObj.getTime() === today.getTime()) {
+                    dayDiv.classList.add('today-highlight');
+                }
+
+                // Mark selected day
+                if (dateStr === selectedCalendarDate && dateObj <= today) {
+                    dayDiv.classList.add('selected-day');
+                }
+
+                // Mark days with duty hours records
+                if (hasDutyHoursRecords(dateStr)) {
+                    dayDiv.classList.add('has-duty-hours');
+                }
+
+                // Mark future dates as disabled
+                if (dateObj > today) {
+                    dayDiv.classList.add('future-date');
+                    dayDiv.style.pointerEvents = 'none';
+                }
+
+                dayDiv.addEventListener('click', () => showDutyHoursForDay(dateStr));
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        function hasDutyHoursRecords(date) {
+            for (const staffId in dailyDutyHours) {
+                if (dailyDutyHours[staffId][date] && dailyDutyHours[staffId][date] > 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function showDutyHoursForDay(dateStr) {
+            const selectedDate = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate > today) {
+                alert('No se pueden ver registros de fechas futuras');
+                renderCalendar(); 
+                return;
+            }
+
+            selectedCalendarDate = dateStr;
+            renderCalendar();
+
+            const selectedDayStaffList = document.getElementById('selectedDayStaffList');
+            const staffOnSelectedDayDiv = document.getElementById('staffOnSelectedDay');
+            const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+            
+            selectedDateDisplay.textContent = dateStr;
+            staffOnSelectedDayDiv.innerHTML = '';
+            
+            let staffFound = false;
+
+            for (const deptKey in staffData) {
+                const department = staffData[deptKey];
+                // Check nurses
+                if (department.nurses) {
+                    department.nurses.forEach(nurse => {
+                        const nurseId = `nurse-${nurse.id}`;
+                        const hours = dailyDutyHours[nurseId]?.[dateStr] || 0;
+                        if (hours > 0) {
+                            staffFound = true;
+                            const staffItem = document.createElement('div');
+                            staffItem.className = 'selected-day-staff-item';
+                            staffItem.innerHTML = `
+                                <p><strong>Enfermera:</strong> ${nurse.name}</p>
+                                <p><strong>ID:</strong> ${nurse.id}</p>
+                                <p><strong>Departamento:</strong> ${department.name}</p>
+                                <p><strong>Horas de Guardia:</strong> ${formatTime(hours)}</p>
+                            `;
+                            staffOnSelectedDayDiv.appendChild(staffItem);
+                        }
+                    });
+                }
+                // Check doctors
+                if (department.doctors) {
+                    department.doctors.forEach(doctor => {
+                        const doctorId = `doctor-${doctor.id}`;
+                        const hours = dailyDutyHours[doctorId]?.[dateStr] || 0;
+                        if (hours > 0) {
+                            staffFound = true;
+                            const staffItem = document.createElement('div');
+                            staffItem.className = 'selected-day-staff-item';
+                            staffItem.innerHTML = `
+                                <p><strong>Doctor:</strong> ${doctor.name}</p>
+                                <p><strong>ID:</strong> ${doctor.id}</p>
+                                <p><strong>Especialidad:</strong> ${doctor.specialty}</p>
+                                <p><strong>Departamento:</strong> ${department.name}</p>
+                                <p><strong>Horas de Guardia:</strong> ${formatTime(hours)}</p>
+                            `;
+                            staffOnSelectedDayDiv.appendChild(staffItem);
+                        }
+                    });
+                }
+            }
+            
+            if (!staffFound) {
+                staffOnSelectedDayDiv.innerHTML = '<p class="text-center text-gray-600">No hay registros de guardia para esta fecha.</p>';
+            }
+            
+            selectedDayStaffList.classList.remove('hidden');
+        }
+
+        // Event listeners for calendar buttons
+        document.getElementById('prevMonthBtn').addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonthBtn').addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Initial render for the default active department
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStaffData();
+            const activeDepartmentButton = document.querySelector('.department-button.active');
+            if (activeDepartmentButton) {
+                renderStaff(activeDepartmentButton.dataset.department);
+            } else {
+                // Default to traumatologia if no active department is found (e.g., first visit)
+                renderStaff('traumatologia');
+            }
+            // Re-establish running stopwatches after reload
+            for (const staffId in stopwatchStates) {
+                if (stopwatchStates[staffId].running) {
+                    startStopwatch(staffId); // This will resume the timer and update the button
+                } else if (stopwatchStates[staffId].elapsedOnStop > 0) {
+                     updateStopwatchDisplay(staffId); // Display the last recorded time if not running
+                }
+            }
+            selectedCalendarDate = formatDate(new Date()); // Set selected date to today by default
+            renderCalendar(); // Render calendar after all data is loaded and current day is set
+        });
+    </script>
+</body>
+</html> 

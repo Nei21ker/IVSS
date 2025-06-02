@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Autorizados - IVSS</title>
+    <title>Pacientes Hospitalizados - IVSS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -76,6 +76,7 @@
             border-radius: 12px;
             font-weight: 500;
             transition: all 0.3s ease;
+            color: white; /* Added to make text white */
         }
 
         .department-button:hover {
@@ -109,37 +110,44 @@
             flex-grow: 1;
             display: flex;
             flex-direction: row;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: flex-start;
-            padding: 3rem;
-            gap: 3rem;
-            max-width: 1600px;
+            padding: 2.5rem; 
+            gap: 2.5rem;    
+            max-width: 2400px; /* Aumentado drásticamente para eliminar restricción de ancho */
             margin: 1rem auto;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             min-height: calc(100vh - 12rem);
+            overflow-x: hidden; 
+            /* Removido: border: 2px solid red; */
         }
 
         .department-view-container {
             flex: 3;
-            min-width: 60%;
+            flex-basis: 0;
+            min-width: unset;
             text-align: left;
             padding: 1rem;
+            /* Removido: border: 2px solid blue; */
         }
 
         .calendar-section {
             flex: 2;
-            min-width: 30%;
+            flex-basis: 0;
+            min-width: 450px; /* Mantener este min-width para el calendario */
+            flex-shrink: 0;
             background: white;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             text-align: center;
             transition: all 0.3s ease;
             padding: 2rem;
-            max-height: calc(100vh - 8rem);
-            overflow-y: auto;
+            /* Removido: overflow: hidden; ya que queremos ver el desbordamiento si ocurre */
+            box-sizing: border-box; 
+            /* Removido: border: 2px solid green; */
         }
 
         .calendar-header {
@@ -168,33 +176,40 @@
 
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            grid-template-columns: repeat(7, 1fr); /* Volver a 1fr */
+            gap: 5px; /* Espacio entre días */
             text-align: center;
             margin-bottom: 2rem;
+            padding: 0; 
+            width: calc((7 * 50px) + (6 * 5px)); /* Ancho total explícito para la cuadrícula */
+            margin: 0 auto; /* Centrar la cuadrícula dentro de su contenedor */
         }
 
         .calendar-day-header {
             font-weight: 700;
             color: #555;
-            padding: 0.5rem;
+            padding: 0.5rem; 
             transition: color 0.3s ease;
+            box-sizing: border-box; 
+            font-size: 0.85rem; 
         }
 
         .calendar-day {
-            padding: 0.75rem 0.5rem;
+            padding: 0.5rem; 
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
+            font-size: 0.85rem; 
             color: #333;
             position: relative;
-            margin-bottom: 1.5rem;
+            padding-bottom: 2.2rem; 
+            box-sizing: border-box; 
         }
 
         .calendar-day:hover {
             background-color: rgba(217, 83, 79, 0.1);
             border: 1px solid rgba(217, 83, 79, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
         }
 
         .calendar-day.current-month {
@@ -203,16 +218,84 @@
         }
 
         .calendar-day.other-month {
-            color: #bbb;
-            background-color: #f5f5f5;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            visibility: hidden; 
         }
 
         .calendar-day.selected-day {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
+            background-color: var(--secondary-color); /* FUERZA el color azul para el día seleccionado */
             color: white;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            z-index: 1;
+            transform: none; /* Evita cualquier escala que pueda causar desbordamiento o doble selección */
+        }
+
+        .calendar-day.selected-day::after {
+            content: none; /* Elimina cualquier texto residual de 'Seleccionado' */
+        }
+
+        .calendar-day.selected-day::before {
+            content: none; /* Elimina cualquier texto residual de 'Seleccionado' */
+        }
+
+        /* Ajuste para cuando Hoy y Seleccionado coinciden */
+        .calendar-day.today-highlight.selected-day::after {
+            content: 'Hoy';
+            bottom: 0.2rem;
+            color: white;
+        }
+
+        .calendar-day.today-highlight.selected-day::before {
+            content: none; /* Elimina texto 'Seleccionado' cuando el día es Hoy y Seleccionado */
+        }
+
+        /* Ajuste para el texto del día para que no se superponga con las etiquetas */
+        .calendar-day > div {
+            position: relative;
+            z-index: 1;
+        }
+
+        .calendar-day.has-medication-records::after {
+            content: '✓';
+            position: absolute;
+            bottom: 1.5rem; 
+            right: 2px;
+            color: #2ecc71;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+
+        .calendar-day.future-date {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            transform: none; /* Asegura que no se escala */
+        }
+
+        .calendar-day.today-highlight {
+            background-color: var(--primary-color); /* Asegura que Hoy sea el único rojo */
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 0 0 2px var(--primary-color);
+            transform: none; /* Asegura que no se escala */
+        }
+
+        .calendar-day.today-highlight::after {
+            content: none; /* Removed 'Hoy' text */
+            position: absolute;
+            bottom: 0.2rem; 
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem; /* Ajuste para mejor ajuste */
+            color: white;
+            white-space: nowrap;
+            background-color: transparent;
+        }
+
+        .calendar-day:not(.future-date):hover {
+            transform: none; /* Elimina cualquier escala al pasar el ratón */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
         }
 
         .calendar-day.has-patient::after {
@@ -230,6 +313,55 @@
             color: white;
             font-weight: 700;
             box-shadow: 0 0 0 2px #d9534f;
+        }
+
+        .calendar-day.today-highlight::after {
+            content: none; /* Removed 'Hoy' text */
+            position: absolute;
+            bottom: 0.2rem; 
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem; /* Ajuste para mejor ajuste */
+            color: white;
+            white-space: nowrap;
+            background-color: transparent;
+        }
+
+        /* Ajuste para cuando Hoy y Seleccionado coinciden */
+        .calendar-day.today-highlight.selected-day::after {
+            content: 'Hoy';
+            bottom: 0.2rem;
+            color: white;
+        }
+
+        .calendar-day.today-highlight.selected-day::before {
+            content: ''; /* Ensure 'Seleccionado' text is removed when also today */
+            position: absolute;
+            bottom: -0.8rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem; /* Ajuste para mejor ajuste */
+            color: #3498db;
+            white-space: nowrap;
+            display: block;
+        }
+
+        /* Existing code for calendar styles */
+        .calendar-day {
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day.has-patient {
+            background-color: rgba(217, 83, 79, 0.1);
+            border: 1px solid rgba(217, 83, 79, 0.2);
+        }
+
+        .calendar-day.selected-day {
+            background: var(--secondary-color); /* FORZADO: Asegura un color sólido azul para el día seleccionado */
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
         }
 
         .selected-day-patients-list {
@@ -461,6 +593,67 @@
         }
 
         body.dark-mode .bed-item .medications {
+            color: #e2e8f0; /* Changed to white */
+        }
+
+        body.dark-mode .medication-item .med-info span.med-text {
+            color: #e2e8f0; /* Ensure medication text is white */
+        }
+
+        body.dark-mode .medication-item.taken .med-text {
+            color: #a0aec0; /* Lighter grey for strikethrough in dark mode */
+        }
+
+        body.dark-mode .medications-grid {
+            background-color: #2d3748;
+        }
+
+        body.dark-mode .medication-item {
+            background-color: #2d3748;
+        }
+
+        body.dark-mode .medication-checkbox {
+            accent-color: #26a69a; /* Secondary color for checkbox tick in dark mode */
+        }
+
+        body.dark-mode .medication-details-block {
+            background-color: #4a5568; /* Darker background for the block */
+            color: #e2e8f0; /* White text for the block */
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem; /* Adjust margin if needed */
+        }
+
+        body.dark-mode .medication-details-block p,
+        body.dark-mode .medication-details-block .fa-pills {
+            color: #e2e8f0; /* Ensure text and icon are white */
+        }
+
+        body.dark-mode #welcomeContent h2,
+        body.dark-mode #welcomeContent p {
+            color: white;
+        }
+
+        body.dark-mode #welcomeContent .text-gray-700,
+        body.dark-mode #welcomeContent .text-gray-700 strong,
+        body.dark-mode #welcomeContent .text-gray-700 li {
+            color: white;
+        }
+
+        body.dark-mode #welcomeContent h3 {
+            color: white;
+        }
+
+        body.dark-mode #welcomeContent .bg-gray-50 {
+            background-color: #2d3748; /* Darker background for the guide box */
+        }
+
+        body.dark-mode .patient-info .patient-stat {
+            background: #4a5568;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .patient-info .patient-stat strong {
             color: #a0aec0;
         }
 
@@ -583,11 +776,141 @@
             border: 1px solid rgba(217, 83, 79, 0.2);
         }
 
-        .calendar-day.selected-day {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #c9302c 100%);
-            color: white;
+        /* REMOVED DUPLICATE CONFLICTING .calendar-day.selected-day RULE */
+
+        .selected-day-patients-list {
+            margin-top: 1.5rem;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding: 1rem;
+            background: white;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .selected-day-patient-item {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .selected-day-patient-item p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .selected-day-patient-item strong {
+            color: #d9534f;
+        }
+
+        .department-details {
+            width: 100%;
+            text-align: left;
+        }
+
+        .department-details h3 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .room-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .room-card h4 {
+            font-size: 1.5rem;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3);
+            color: #555;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .bed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .bed-item {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .bed-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .bed-item strong {
+            color: #d9534f;
+        }
+
+        .bed-item p {
+            margin-bottom: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .bed-item .medications {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: color 0.3s ease;
+        }
+
+        .medication-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.2rem;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .medication-item .med-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .medication-item input[type="checkbox"] {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .bed-manage-btn {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .bed-manage-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
         }
 
         /* Dark mode improvements */
@@ -650,14 +973,15 @@
         }
 
         .calendar-day.today-highlight::after {
-            content: 'Hoy';
+            content: none; /* Removed 'Hoy' text */
             position: absolute;
-            bottom: -1.5rem;
+            bottom: 0.2rem; 
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.7rem;
-            color: #d9534f;
+            font-size: 0.65rem; /* Ajuste para mejor ajuste */
+            color: white;
             white-space: nowrap;
+            background-color: transparent;
         }
 
         .manage-button {
@@ -670,6 +994,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            margin-left: 2rem; /* Increased margin to move button further right */
         }
 
         .manage-button:hover {
@@ -743,6 +1068,40 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        .medication-item.taken .med-text {
+            text-decoration: line-through;
+            color: #a0aec0; /* Un color más tenue para el texto tachado */
+        }
+
+        .medication-status-icon {
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Controlar visibilidad de iconos basados en el estado del medicamento */
+        .medication-item[data-medication-taken="true"] .medication-status-times {
+            display: none;
+        }
+
+        .medication-item[data-medication-taken="false"] .medication-status-check {
+            display: none;
+        }
+
+        /* Estilo para el checkbox marcado */
+        .medication-checkbox:checked {
+            accent-color: #2ecc71;
+        }
+
+        /* Asegurar que el scrollbar del calendario no aparezca si no es necesario */
+        .calendar-section::-webkit-scrollbar {
+            width: 0px;
+            background: transparent; 
+        }
+
+        .calendar-section {
+            -ms-overflow-style: none; 
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -752,8 +1111,15 @@
             <div class="modal-header">
                 <div class="flex flex-col w-full">
                     <h2 id="modalTitle" class="text-xl font-semibold text-white mb-2">
-                        Gestión de Paciente:
+                        Gestión de Paciente
                     </h2>
+                    <div class="flex items-center gap-4 mb-3">
+                        <label class="text-white text-sm">Paciente:</label>
+                        <input type="text" 
+                               id="modalPatientName" 
+                               class="px-2 py-1 rounded text-gray-800 flex-1" 
+                               value="${patient.patient}">
+                    </div>
                     <div class="flex items-center gap-4">
                         <label class="text-white text-sm">Fecha:</label>
                         <input type="date" 
@@ -816,9 +1182,10 @@
 
     <header class="dashboard-header">
         <div class="header-top">
-            <h1 class="header-title">Dashboard de Autorizados</h1>
+            <h1 class="header-title">Pacientes Hospitalizados</h1>
             <div class="header-actions">
                 <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+                <button id="guardStaffBtn" class="logout-button ml-2">Personal de Guardia</button>
                 <button id="themeToggleBtn" class="theme-toggle-button">
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
@@ -845,6 +1212,40 @@
             <div id="welcomeContent" class="text-center">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">Bienvenido, Usuario Autorizado</h2>
                 <p class="text-xl text-gray-600">Selecciona un departamento para ver la información de las salas y pacientes.</p>
+                <div class="mt-8 text-left max-w-2xl mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Guía de Uso</h3>
+                    <p class="text-gray-700 mb-3">
+                        Este panel interactivo fue diseñado para optimizar la gestión de pacientes y personal en el hospital.
+                        A continuación, una breve guía de sus funcionalidades:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>
+                            <strong>Departamentos:</strong> Utiliza los botones de departamento en la parte superior para
+                            filtrar y ver la información de salas y camas específicas de cada área (Traumatología, Ginecología, etc.).
+                        </li>
+                        <li>
+                            <strong>Gestión de Pacientes:</strong> Dentro de cada sala, puedes gestionar los medicamentos
+                            de cada paciente, marcar su administración diaria y añadir notas importantes.
+                            Los cambios se guardan automáticamente.
+                        </li>
+                        <li>
+                            <strong>Calendario de Pacientes:</strong> El calendario en la parte derecha te permite
+                            ver el estado de los pacientes y sus medicamentos en días pasados, proporcionando un historial útil.
+                        </li>
+                        <li>
+                            <strong>Personal de Guardia:</strong> Haz clic en el botón <span class="font-medium text-red-600">"Personal de Guardia"</span>
+                            en la esquina superior derecha para acceder a un listado de enfermeras y doctores.
+                            Aquí puedes gestionar sus datos y registrar el tiempo de guardia con un cronómetro individual.
+                        </li>
+                        <li>
+                            <strong>Modo Oscuro:</strong> Activa o desactiva el modo oscuro para una mejor visualización
+                            según tus preferencias, usando el icono de luna/sol.
+                        </li>
+                    </ul>
+                    <p class="text-gray-700 mt-4">
+                        ¡Esperamos que esta herramienta mejore tu eficiencia y el cuidado de nuestros pacientes!
+                    </p>
+                </div>
             </div>
 
             <div id="departmentDetails" class="department-details hidden">
@@ -1035,7 +1436,9 @@
         function loadSavedData() {
             const savedData = localStorage.getItem('hospitalData');
             if (savedData) {
-                Object.assign(hospitalData, JSON.parse(savedData));
+                const parsedData = JSON.parse(savedData);
+                Object.assign(hospitalData, parsedData);
+                console.log("Hospital Data Loaded:", hospitalData);
             }
         }
 
@@ -1078,8 +1481,15 @@
             modalHeader.innerHTML = `
                 <div class="flex flex-col w-full">
                     <h2 id="modalTitle" class="text-xl font-semibold text-white mb-2">
-                        Gestión de Paciente: ${patient.patient}
+                        Gestión de Paciente
                     </h2>
+                    <div class="flex items-center gap-4 mb-3">
+                        <label class="text-white text-sm">Paciente:</label>
+                        <input type="text" 
+                               id="modalPatientName" 
+                               class="px-2 py-1 rounded text-gray-800 flex-1" 
+                               value="${patient.patient}">
+                    </div>
                     <div class="flex items-center gap-4">
                         <label class="text-white text-sm">Fecha:</label>
                         <input type="date" 
@@ -1173,6 +1583,13 @@
 
                 // Actualizar el calendario si hay cambios
                 renderCalendar();
+
+                // Re-renderizar el departamento actual para reflejar el cambio en la vista principal
+                const activeDepartment = document.querySelector('.department-button.active');
+                if (activeDepartment) {
+                    const departmentKey = activeDepartment.dataset.department;
+                    displayDepartmentDetails(hospitalData[departmentKey], selectedCalendarDate);
+                }
             }
         }
 
@@ -1241,7 +1658,7 @@
         }
 
         // Función para mostrar los detalles del departamento
-        function displayDepartmentDetails(department) {
+        function displayDepartmentDetails(department, selectedDisplayDate = null) {
             const welcomeContent = document.getElementById('welcomeContent');
             const departmentDetailsDiv = document.getElementById('departmentDetails');
             
@@ -1308,31 +1725,31 @@
                                     <span><strong>Tipo de Sangre:</strong> ${bed.bloodType}</span>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <p class="font-medium mb-2">
-                                    <i class="fas fa-pills"></i>
-                                    Medicamentos:
-                                </p>
-                                <div class="medications-grid">
+                            <div class="patient-stat mt-4">
+                                <i class="fas fa-pills"></i>
+                                <span><strong>Medicamentos:</strong></span>
+                            </div>
+                            <div class="medications-grid mt-2">
                                     ${(bed.medications || []).map(med => {
-                                        const today = new Date().toISOString().split('T')[0];
-                                        const isTaken = bed.medicationsStatus?.[today]?.[med] || false;
+                                        // Usar selectedDisplayDate si está disponible, de lo contrario usar la fecha actual
+                                        const displayDate = selectedDisplayDate || formatDate(new Date());
+                                        const isTaken = bed.medicationsStatus?.[displayDate]?.[med] === true; // Aseguramos que sea true
+                                        console.log(`  Medication in dashboard: ${med}, isTaken: ${isTaken} for date ${displayDate}`);
                                         return `
-                                            <div class="medication-item ${isTaken ? 'taken' : ''}">
+                                            <div class="medication-item ${isTaken ? 'taken' : ''}" data-medication-taken="${isTaken}">
                                                 <div class="med-info">
-                                                    <input type="checkbox" 
-                                                           class="medication-checkbox" 
+                                                    <input type="checkbox"
+                                                           class="medication-checkbox"
                                                            data-bed-id="${bed.id}"
                                                            data-medication="${med}"
                                                            ${isTaken ? 'checked' : ''}>
-                                                    <span>${med}</span>
+                                                    <span class="med-text ${isTaken ? 'text-gray-500 line-through' : 'text-gray-800'}">${med}</span>
                                                 </div>
-                                                <i class="fas ${isTaken ? 'fa-check-circle text-green-500' : 'fa-times-circle text-gray-400'}"></i>
+                                                ${isTaken ? '<i class="fas fa-check-circle text-green-500 medication-status-icon medication-status-check"></i>' : ''}
                                             </div>
                                         `;
                                     }).join('')}
                                 </div>
-                            </div>
                         </div>
                     `;
                 });
@@ -1379,7 +1796,7 @@
                 const department = hospitalData[departmentKey];
                 
                 if (department) {
-                    displayDepartmentDetails(department);
+                    displayDepartmentDetails(department, selectedCalendarDate);
                 }
             });
         });
@@ -1422,9 +1839,15 @@
                 calendarGrid.appendChild(dayDiv);
             }
 
+            // Clear any previously selected day before re-rendering
+            document.querySelectorAll('.calendar-day.selected-day').forEach(el => {
+                el.classList.remove('selected-day');
+            });
+
             // Agregar días del mes actual
             const today = new Date();
             today.setHours(0, 0, 0, 0);
+            console.log("renderCalendar: Today is", formatDate(today), "Selected Calendar Date (before loop) is", selectedCalendarDate);
 
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const dayDiv = document.createElement('div');
@@ -1438,21 +1861,27 @@
                 // Marcar el día actual
                 if (currentDateObj.getTime() === today.getTime()) {
                     dayDiv.classList.add('today-highlight');
+                    console.log(`  Day ${day} (${dateStr}): Marked as today-highlight.`);
                 }
 
                 // Marcar el día seleccionado
-                if (dateStr === selectedCalendarDate) {
+                // Solo aplica selected-day si dateStr es igual a selectedCalendarDate Y no es una fecha futura.
+                if (dateStr === selectedCalendarDate && currentDateObj <= today) {
                     dayDiv.classList.add('selected-day');
+                    console.log(`  Day ${day} (${dateStr}): Marked as selected-day.`);
                 }
 
                 // Marcar días pasados con registros de medicamentos
                 if (currentDateObj < today && hasMedicationRecords(dateStr)) {
                     dayDiv.classList.add('has-medication-records');
+                    console.log(`  Day ${day} (${dateStr}): Has medication records.`);
                 }
 
-                // Marcar días futuros con un estilo diferente
+                // Marcar días futuros con un estilo diferente y deshabilitarlos
                 if (currentDateObj > today) {
                     dayDiv.classList.add('future-date');
+                    dayDiv.style.pointerEvents = 'none'; // Deshabilita clics en fechas futuras
+                    console.log(`  Day ${day} (${dateStr}): Marked as future-date.`);
                 }
 
                 dayDiv.addEventListener('click', () => showPatientsForDay(dateStr));
@@ -1461,17 +1890,22 @@
         }
 
         function showPatientsForDay(dateStr) {
+            console.log("showPatientsForDay called with dateStr:", dateStr);
             const selectedDate = new Date(dateStr);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
             if (selectedDate > today) {
                 showNotification('No se pueden ver registros de fechas futuras', 'error');
+                // NO actualizar selectedCalendarDate si es una fecha futura. Mantener la selección anterior.
+                console.log("showPatientsForDay: Clicked future date, selectedCalendarDate remains", selectedCalendarDate);
+                renderCalendar(); 
                 return;
             }
 
-            // Actualizar el día seleccionado y refrescar el calendario
+            // Actualizar el día seleccionado y refrescar el calendario SOLO si es una fecha válida (pasada o actual)
             selectedCalendarDate = dateStr;
+            console.log("showPatientsForDay: selectedCalendarDate updated to", selectedCalendarDate);
             renderCalendar();
 
             const selectedDayPatientsList = document.getElementById('selectedDayPatientsList');
@@ -1593,6 +2027,11 @@
             window.location.href = 'index.html';
         });
 
+        // Funcionalidad del botón Personal de Guardia
+        document.getElementById('guardStaffBtn').addEventListener('click', () => {
+            window.location.href = 'guard_staff.html';
+        });
+
         // Inicializar el calendario al cargar la página
         renderCalendar();
 
@@ -1667,6 +2106,8 @@
         function saveChanges() {
             if (!currentPatient || !selectedDateForManagement) return;
 
+            // Recopilar nuevo nombre de paciente
+            const newPatientName = document.getElementById('modalPatientName').value.trim();
             // Recopilar notas
             const notes = document.getElementById('patientNotes').value;
 
@@ -1675,6 +2116,10 @@
                 hospitalData[dept].rooms.forEach(room => {
                     room.beds.forEach(bed => {
                         if (bed.id === currentPatient.id) {
+                            // Actualizar nombre del paciente
+                            bed.patient = newPatientName;
+                            currentPatient.patient = newPatientName; // Actualizar también en currentPatient
+
                             // Actualizar lista de medicamentos
                             bed.medications = currentPatient.medications;
                             
@@ -1698,7 +2143,7 @@
             const activeDepartment = document.querySelector('.department-button.active');
             if (activeDepartment) {
                 const departmentKey = activeDepartment.dataset.department;
-                displayDepartmentDetails(hospitalData[departmentKey]);
+                displayDepartmentDetails(hospitalData[departmentKey], selectedCalendarDate);
             }
 
             // Mostrar notificación de éxito
@@ -1745,7 +2190,15 @@
         // Cargar datos guardados al iniciar la página
         document.addEventListener('DOMContentLoaded', function() {
             loadSavedData();
+            // Asegurar que selectedCalendarDate siempre sea la fecha actual al cargar la página
+            selectedCalendarDate = formatDate(new Date());
             renderCalendar();
+            // Cargar el departamento inicial si hay uno activo guardado
+            const activeDepartmentButton = document.querySelector('.department-button.active');
+            if (activeDepartmentButton) {
+                const departmentKey = activeDepartmentButton.dataset.department;
+                displayDepartmentDetails(hospitalData[departmentKey], selectedCalendarDate);
+            }
         });
 
         // Actualizar los estilos
@@ -1783,14 +2236,15 @@
             }
 
             .calendar-day.today-highlight::after {
-                content: 'Hoy';
+                content: none; /* Removed 'Hoy' text */
                 position: absolute;
-                bottom: -1.5rem;
+                bottom: 0.2rem; 
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 0.7rem;
-                color: #d9534f;
+                font-size: 0.65rem; /* Ajuste para mejor ajuste */
+                color: white;
                 white-space: nowrap;
+                background-color: transparent;
             }
 
             .calendar-day.selected-day {
@@ -1803,12 +2257,12 @@
             }
 
             .calendar-day.selected-day::after {
-                content: 'Seleccionado';
+                content: ''; /* Changed to remove 'Seleccionado' text */
                 position: absolute;
-                bottom: -1.5rem;
+                bottom: -0.8rem; 
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 0.7rem;
+                font-size: 0.65rem; /* Ajuste para mejor ajuste */
                 color: #3498db;
                 white-space: nowrap;
             }
